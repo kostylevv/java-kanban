@@ -4,7 +4,7 @@ import java.util.Set;
 
 public class Epic extends Task {
 
-    private Set<Integer> subtasks; //эпик знает ID подзадач, но не хранит их
+    protected Set<Integer> subtasks; //эпик знает ID подзадач, но не хранит их
 
     public Epic(String title, String description) {
         super(title, description, TASK_STATUS.NEW, TASK_TYPE.EPIC);

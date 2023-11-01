@@ -1,19 +1,16 @@
 public class Task {
-    public enum TASK_STATUS {NEW, DONE, IN_PROGRESS}
-    public enum TASK_TYPE {TASK, SUBTASK, EPIC} //для упрощения определения типа задачи
 
-    private int id;
-    private String title;
-    private String description;
-    private TASK_STATUS status;
-    private final TASK_TYPE type;
+    protected int id;
+    protected String title;
+    protected String description;
+    protected TASK_STATUS status;
+    protected final TASK_TYPE type;
 
     public Task(String title, String description, TASK_STATUS status) {
         this.title = title;
         this.description = description;
         this.status = status;
         this.type = TASK_TYPE.TASK;
-        this.id = -1;               //присваивается таск менеджером
     }
 
     //конструктор для наследников
@@ -21,7 +18,6 @@ public class Task {
         this.title = title;
         this.description = description;
         this.status = status;
-        this.id = -1;
         this.type = type;
     }
 
