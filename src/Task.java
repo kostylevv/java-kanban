@@ -3,18 +3,18 @@ public class Task {
     protected int id;
     protected String title;
     protected String description;
-    protected TASK_STATUS status;
-    protected final TASK_TYPE type;
+    protected TaskStatusEnum status;
+    protected final TaskTypeEnum type;
 
-    public Task(String title, String description, TASK_STATUS status) {
+    public Task(String title, String description, TaskStatusEnum status) {
         this.title = title;
         this.description = description;
         this.status = status;
-        this.type = TASK_TYPE.TASK;
+        this.type = TaskTypeEnum.TASK;
     }
 
     //конструктор для наследников
-    public Task(String title, String description, TASK_STATUS status, TASK_TYPE type) {
+    public Task(String title, String description, TaskStatusEnum status, TaskTypeEnum type) {
         this.title = title;
         this.description = description;
         this.status = status;
@@ -50,15 +50,15 @@ public class Task {
         this.description = description;
     }
 
-    public TASK_STATUS getStatus() {
+    public TaskStatusEnum getStatus() {
         return status;
     }
 
-    protected void setStatus(TASK_STATUS status) {
+    protected void setStatus(TaskStatusEnum status) {
         this.status = status;
     }
 
-    public TASK_TYPE getType() {
+    public TaskTypeEnum getType() {
         return type;
     }
 }

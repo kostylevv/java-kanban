@@ -1,1 +1,0 @@
-public enum TASK_STATUS {NEW, DONE, IN_PROGRESS}

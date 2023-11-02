@@ -1,8 +1,8 @@
 public class Subtask extends Task {
-    protected int idEpic;
+    private int idEpic;
 
-    public Subtask(String title, String description, TASK_STATUS status, int idEpic) {
-        super(title, description, status, TASK_TYPE.SUBTASK);
+    public Subtask(String title, String description, TaskStatusEnum status, int idEpic) {
+        super(title, description, status, TaskTypeEnum.SUBTASK);
         this.idEpic = idEpic;
     }
 

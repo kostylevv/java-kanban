@@ -1,0 +1,1 @@
+public enum TaskStatusEnum {NEW, DONE, IN_PROGRESS}

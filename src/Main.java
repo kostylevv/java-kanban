@@ -4,8 +4,8 @@ public class Main {
         System.out.println("Поехали!");
         TaskManager taskManager = new TaskManager();
 
-        Task task = new Task("test title task1", "test desc 1", TASK_STATUS.NEW);
-        Task task1 = new Task("test title taks2", "test desc2 ", TASK_STATUS.IN_PROGRESS);
+        Task task = new Task("test title task1", "test desc 1", TaskStatusEnum.NEW);
+        Task task1 = new Task("test title taks2", "test desc2 ", TaskStatusEnum.IN_PROGRESS);
 
         Epic epic = new Epic("e1", "e1d");
         Epic epic1 = new Epic("e2", "e2d");
@@ -16,9 +16,9 @@ public class Main {
         taskManager.addEpic(epic);
         taskManager.addEpic(epic1);
 
-        Subtask subtask = new Subtask("St1", "st1d", TASK_STATUS.NEW, epic.getId());
-        Subtask subtask1 = new Subtask("St2", "st2d", TASK_STATUS.NEW, epic.getId());
-        Subtask subtask2 = new Subtask("St3", "st3d", TASK_STATUS.NEW, epic1.getId());
+        Subtask subtask = new Subtask("St1", "st1d", TaskStatusEnum.NEW, epic.getId());
+        Subtask subtask1 = new Subtask("St2", "st2d", TaskStatusEnum.NEW, epic.getId());
+        Subtask subtask2 = new Subtask("St3", "st3d", TaskStatusEnum.NEW, epic1.getId());
 
         taskManager.addSubtask(subtask);
         taskManager.addSubtask(subtask1);
@@ -44,14 +44,14 @@ public class Main {
         System.out.println("Epic1:");
         System.out.println(epic1.toString());
 
-        Subtask subtask3 = new Subtask("St3", "st3d", TASK_STATUS.DONE, epic1.getId());
+        Subtask subtask3 = new Subtask("St3", "st3d", TaskStatusEnum.DONE, epic1.getId());
         System.out.println("Add subtask3 to epic1");
         taskManager.addSubtask(subtask3);
         System.out.println("Epic1:");
         System.out.println(epic1.toString());
 
         System.out.println("Chng status in subtask3 to IN_PROG");
-        subtask3.setStatus(TASK_STATUS.IN_PROGRESS);
+        subtask3.setStatus(TaskStatusEnum.IN_PROGRESS);
         System.out.println(subtask3.toString());
         System.out.println("Replace subtaks3");
         taskManager.updateSubtask(subtask3);

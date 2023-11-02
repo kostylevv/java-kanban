@@ -139,36 +139,25 @@ public class TaskManager {
      */
 
     public void addTask(Task task) {
-        if (task != null && task.getType() == TASK_TYPE.TASK) {
-            if (task.getId() == 0) {
-                task.setId(getTaskId());
-                tasks.put(task.getId(), task);
-            } else {
-                System.out.println("Добавление задачи с назначенным ID не допускается, " +
-                        "используйте метод updateTask. Передана задача с ID = " + task.getId());
-            }
+        if (task != null && task.getType() == TaskTypeEnum.TASK) {
+            task.setId(getTaskId());
+            tasks.put(task.getId(), task);
         } else {
             System.out.println("Task == null или неверный тип задачи");
-        }        
+        }
     }
 
     public void addSubtask(Subtask task) {
-        if (task != null && task.getType() == TASK_TYPE.SUBTASK) {
-            if (task.getId() == 0) {
-                if (epics.containsKey(task.getIdEpic())) {
-                    task.setId(getTaskId());
-                    subTasks.put(task.getId(), task);
-
-                    Epic epic = epics.get(task.getIdEpic());
-                    epic.addSubtask(task.getId());
-                    identifyEpicStatus(epic);
-                } else {
-                    System.out.println("Невозможно добавить подзадачу для несуществующего " +
-                            "эпика с ID = " + task.getIdEpic());
-                }
+        if (task != null && task.getType() == TaskTypeEnum.SUBTASK) {
+            if (epics.containsKey(task.getIdEpic())) {
+                task.setId(getTaskId());
+                subTasks.put(task.getId(), task);
+                Epic epic = epics.get(task.getIdEpic());
+                epic.addSubtask(task.getId());
+                identifyEpicStatus(epic);
             } else {
-                System.out.println("Добавление задачи с назначенным ID не допускается, " +
-                        "используйте метод updateSubtask. Передана задача с ID = " + task.getId());
+                System.out.println("Невозможно добавить подзадачу для несуществующего " +
+                        "эпика с ID = " + task.getIdEpic());
             }
         } else {
             System.out.println("Task == null или неверный тип задачи");
@@ -176,18 +165,13 @@ public class TaskManager {
     }
 
     public void addEpic(Epic task) {
-        if (task != null && task.getType() == TASK_TYPE.EPIC) {
-            if (task.getId() == 0) {
-                if (subTasks.keySet().containsAll(task.getSubtasks())) {
-                    task.setId(getTaskId());
-                    epics.put(task.getId(), task);
-                    identifyEpicStatus(task);
-                } else {
-                    System.out.println("Невозможно добавить эпик c несуществующими подзадачами");
-                }
+        if (task != null && task.getType() == TaskTypeEnum.EPIC) {
+            if (subTasks.keySet().containsAll(task.getSubtasks())) {
+                task.setId(getTaskId());
+                epics.put(task.getId(), task);
+                identifyEpicStatus(task);
             } else {
-                System.out.println("Добавление задачи с назначенным ID не допускается, " +
-                        "используйте метод updateSubtask. Передана задача с ID = " + task.getId());
+                System.out.println("Невозможно добавить эпик c несуществующими подзадачами");
             }
         } else {
             System.out.println("Task == null или неверный тип задачи");
@@ -200,39 +184,34 @@ public class TaskManager {
     private void identifyEpicStatus(Epic epic) {
         if (epic != null && epics.containsKey(epic.getId())) {
             if (epic.getSubtasks().isEmpty()) {
-                epic.setStatus(TASK_STATUS.NEW);
-                return;
-            }
-            boolean statusNew = false;
-            boolean statusDone = false;
-            List<Subtask> subtasks = this.getSubtasks(epic);
-            for (Subtask subtask : subtasks) {
-                if (subtask.getStatus() == TASK_STATUS.IN_PROGRESS) {
-                    epic.setStatus(TASK_STATUS.IN_PROGRESS);
-                    return;
-                } else if (subtask.getStatus() == TASK_STATUS.NEW) {
-                    statusNew = true;
-                } else if (subtask.getStatus() == TASK_STATUS.DONE) {
-                    statusDone = true;
-                } 
-            }
-
-            if (statusDone == true && statusNew == false) {
-                epic.setStatus(TASK_STATUS.DONE);
-                return;
-            } else if (statusDone = false && statusNew == true) {
-                epic.setStatus(TASK_STATUS.NEW);
-                return;
+                epic.setStatus(TaskStatusEnum.NEW);
             } else {
-                epic.setStatus(TASK_STATUS.IN_PROGRESS);
-                return;
-            }
+                boolean statusNew = false;
+                boolean statusDone = false;
 
+                List<Subtask> subtasks = this.getSubtasks(epic);
+                for (Subtask subtask : subtasks) {
+                    if (subtask.getStatus() == TaskStatusEnum.IN_PROGRESS) {
+                        epic.setStatus(TaskStatusEnum.IN_PROGRESS);
+                        return;
+                    } else if (subtask.getStatus() == TaskStatusEnum.NEW) {
+                        statusNew = true;
+                    } else if (subtask.getStatus() == TaskStatusEnum.DONE) {
+                        statusDone = true;
+                    }
+                }
+
+                if (statusDone == true && statusNew == false) {
+                    epic.setStatus(TaskStatusEnum.DONE);
+                } else if (statusDone = false && statusNew == true) {
+                    epic.setStatus(TaskStatusEnum.NEW);
+                } else {
+                    epic.setStatus(TaskStatusEnum.IN_PROGRESS);
+                }
+            }
         } else {
             System.out.println("Epic == null или нет эпика с ID = " + epic.getId());
         }
-        epic.setStatus(TASK_STATUS.NEW);
-        return;
     }
 
     private int getTaskId() {
