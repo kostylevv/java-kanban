@@ -6,15 +6,14 @@ public class InMemoryTaskManager implements TaskManager {
     private Map<Integer, Subtask> subTasks;
     private Map<Integer, Epic> epics;
     private int lastId;
-
-    //@TODO move to utility class
-    public HistoryManager historyManager = new InMemoryHistoryManager();
+    private HistoryManager historyManager;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
         subTasks = new HashMap<>();
         epics = new HashMap<>();
         lastId = 0;
+        historyManager = Managers.getDefaultHistory();
     }
 
     public List<Task> getHistory() {

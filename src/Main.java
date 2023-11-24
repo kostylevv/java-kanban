@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
-        TaskManager taskManager = new InMemoryTaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         Task task = new Task("test title task1", "test desc 1", TaskStatusEnum.NEW);
         Task task1 = new Task("test title taks2", "test desc2 ", TaskStatusEnum.IN_PROGRESS);
