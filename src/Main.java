@@ -2,7 +2,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = new InMemoryTaskManager();
 
         Task task = new Task("test title task1", "test desc 1", TaskStatusEnum.NEW);
         Task task1 = new Task("test title taks2", "test desc2 ", TaskStatusEnum.IN_PROGRESS);
