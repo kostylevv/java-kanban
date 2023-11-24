@@ -1,6 +1,8 @@
 import java.util.*;
 
 public interface TaskManager {
+    public List<Task> getHistory();
+
     /*
     Получение списков всех задач
      */

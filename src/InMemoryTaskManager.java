@@ -7,11 +7,18 @@ public class InMemoryTaskManager implements TaskManager {
     private Map<Integer, Epic> epics;
     private int lastId;
 
+    //@TODO move to utility class
+    public HistoryManager historyManager = new InMemoryHistoryManager();
+
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
         subTasks = new HashMap<>();
         epics = new HashMap<>();
         lastId = 0;
+    }
+
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
     /*
@@ -37,16 +44,19 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public Task getTaskById(int id) {
+        historyManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
     public Subtask getSubTaskById(int id) {
+        historyManager.add(subTasks.get(id));
         return subTasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
+        historyManager.add(epics.get(id));
         return epics.get(id);
     }
 
@@ -241,5 +251,4 @@ public class InMemoryTaskManager implements TaskManager {
             subTasks.remove(id);
         }
     }
-
 }
