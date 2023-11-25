@@ -3,12 +3,10 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> viewedTasks; //хранит просмотренные задачи
-    private int tasksViewedCount; // сколько задач записано в историю просмотров
     private static final int HISTORY_CAPACITY = 10;
 
     public InMemoryHistoryManager() {
         viewedTasks = new ArrayList<>(HISTORY_CAPACITY);
-        tasksViewedCount = 0;
     }
 
     /*
@@ -22,19 +20,11 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         if (task != null) {
-            if (tasksViewedCount == HISTORY_CAPACITY) {
-                //shift
-                List<Task> newHistory = new ArrayList<>();
-
-                for (int i = 0; i < HISTORY_CAPACITY - 1; i++) {
-                    newHistory.add(i, viewedTasks.get(i + 1));
-                }
-                newHistory.add(task);
-                viewedTasks = newHistory;
-            } else {
-                viewedTasks.add(task);
-                tasksViewedCount++;
+            if (viewedTasks.size() == HISTORY_CAPACITY) {
+                //shift to the left
+                viewedTasks.remove(0);
             }
+            viewedTasks.add(task);
         }
     }
 }
