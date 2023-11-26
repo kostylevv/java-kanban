@@ -19,12 +19,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        if (task != null) {
-            if (viewedTasks.size() == HISTORY_CAPACITY) {
-                //shift to the left
-                viewedTasks.remove(0);
-            }
-            viewedTasks.add(task);
+        if (viewedTasks.size() == HISTORY_CAPACITY) {
+            //shift to the left
+            viewedTasks.remove(0);
         }
+
+        viewedTasks.add(task);
     }
 }
