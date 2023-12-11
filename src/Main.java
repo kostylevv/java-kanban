@@ -3,7 +3,6 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Поехали!");
         TaskManager taskManager = Managers.getDefault();
 
         Task task = new Task("test title task1", "test desc 1", TaskStatusEnum.NEW);
@@ -30,66 +29,57 @@ public class Main {
         for (Task t : taskManager.getAllTasks()) {
             System.out.println(t.toString());
         }
-
-        System.out.println("SubTasks:");
-        for (Subtask t : taskManager.getAllSubtasks()) {
+        System.out.println("Subtasks:");
+        for (Task t : taskManager.getAllSubtasks()) {
+            System.out.println(t.toString());
+        }
+        System.out.println("Epics:");
+        for (Task t : taskManager.getAllEpics()) {
             System.out.println(t.toString());
         }
 
-        System.out.println("Epics");
-        for (Epic t : taskManager.getAllEpics()) {
-            System.out.println(t.toString());
-        }
-
-        System.out.println("History:");
-        System.out.println(taskManager.getHistory());
-        System.out.println("------");
+        printHistory(taskManager);
 
         taskManager.getTaskById(1);
         taskManager.getTaskById(2);
+        printHistory(taskManager);
+
         taskManager.getTaskById(2);
         taskManager.getTaskById(1);
+        taskManager.getTaskById(2);
+        taskManager.getTaskById(1);
+        printHistory(taskManager);
 
-        System.out.println("History:");
-        for (Task th : taskManager.getHistory()) {
-            System.out.println(th);
-        }
-        System.out.println("------");
-
+        taskManager.getSubTaskById(6);
+        taskManager.getSubTaskById(5);
         taskManager.getSubTaskById(5);
         taskManager.getSubTaskById(7);
-        taskManager.getSubTaskById(6);
-
-        System.out.println("History:");
-        for (Task th : taskManager.getHistory()) {
-            System.out.println(th);
-        }
-        System.out.println("------");
-
-        taskManager.deleteTaskById(2);
-
-        System.out.println("History:");
-        for (Task th : taskManager.getHistory()) {
-            System.out.println(th);
-        }
-        System.out.println("------");
-
+        taskManager.getSubTaskById(7);
         taskManager.getEpicById(3);
         taskManager.getEpicById(4);
 
-        System.out.println("History:");
-        for (Task th : taskManager.getHistory()) {
-            System.out.println(th);
-        }
-        System.out.println("------");
+        printHistory(taskManager);
+
+        taskManager.deleteTaskById(1);
+        printHistory(taskManager);
 
         taskManager.deleteEpicById(3);
+        printHistory(taskManager);
 
-        System.out.println("History:");
-        for (Task th : taskManager.getHistory()) {
-            System.out.println(th);
+        taskManager.deleteAllTasks();
+        taskManager.deleteAllSubTasks();
+        printHistory(taskManager);
+
+        taskManager.deleteAllEpics();
+        printHistory(taskManager);
+    }
+
+    private static void printHistory(TaskManager taskManager){
+        System.out.println("--- History ---");
+        for (Task task : taskManager.getHistory()) {
+            System.out.println(task.toString());
         }
-        System.out.println("------");
+        System.out.println("--- End of History ---");
 
     }
 }

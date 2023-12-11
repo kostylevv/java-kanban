@@ -27,6 +27,8 @@ public class Epic extends Task {
         subtasks.remove(id);
     }
 
+    public void clearSubtasks() {subtasks.clear();}
+
     @Override
     public String toString() {
         return super.toString() + ", subtasks = " + Arrays.asList(subtasks.toArray());

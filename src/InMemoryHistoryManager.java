@@ -1,9 +1,8 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class InMemoryHistoryManagerCustom implements HistoryManager {
+public class InMemoryHistoryManager implements HistoryManager {
     private static class Node {
         Task item;
         Node next;
@@ -42,9 +41,6 @@ public class InMemoryHistoryManagerCustom implements HistoryManager {
                 node = node.next;
             }
         }
-
-       //@TODO remove System.out.println(Arrays.asList(history));
-
         return result;
     }
 
@@ -85,7 +81,6 @@ public class InMemoryHistoryManagerCustom implements HistoryManager {
             next.prev = prev;
             node.next = null;
         }
-
         node.item = null;
     }
 }
