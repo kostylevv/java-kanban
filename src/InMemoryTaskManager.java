@@ -1,17 +1,11 @@
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-
-    /*
-    @TODO check for double get
-    @TODO clear history in mass clear
-     */
-
-    private Map<Integer, Task> tasks;
-    private Map<Integer, Subtask> subTasks;
-    private Map<Integer, Epic> epics;
+    private final Map<Integer, Task> tasks;
+    private final Map<Integer, Subtask> subTasks;
+    private final Map<Integer, Epic> epics;
     private int lastId;
-    private HistoryManager historyManager;
+    private final HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();
@@ -31,17 +25,17 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public List<Task> getAllTasks() {
-        return new ArrayList<Task>(tasks.values());
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
     public List<Subtask> getAllSubtasks() {
-        return new ArrayList<Subtask>(subTasks.values());
+        return new ArrayList<>(subTasks.values());
     }
 
     @Override
     public List<Epic> getAllEpics() {
-        return new ArrayList<Epic>(epics.values());
+        return new ArrayList<>(epics.values());
     }
 
     /*
@@ -79,7 +73,6 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void deleteTaskById(int id) {
-        Task task = tasks.get(id);
         tasks.remove(id);
         historyManager.remove(id);
     }
@@ -117,7 +110,7 @@ public class InMemoryTaskManager implements TaskManager {
                 result.add(subTasks.get(id));
             }
         } else {
-            System.out.println("Epic == null или нет эпика с ID = " + epic.getId());
+            System.out.println("Epic == null или нет такого эпика");
         }
         return result;
     }
@@ -237,7 +230,7 @@ public class InMemoryTaskManager implements TaskManager {
     Метод следит за статусом эпика исходя из статусов подзадач
      */
     private void updateEpicStatus(Epic epic) {
-        if (epic != null) {
+        if (epic != null && epics.containsKey(epic.getId())) {
             List<Subtask> subtasks = getSubtasks(epic);
             if (subtasks.isEmpty()) {
                 epic.setStatus(TaskStatusEnum.NEW);
@@ -255,16 +248,16 @@ public class InMemoryTaskManager implements TaskManager {
                     }
                 }
 
-                if (statusDone == true && statusNew == false) {
+                if (statusDone && !statusNew) {
                     epic.setStatus(TaskStatusEnum.DONE);
-                } else if (statusDone = false && statusNew == true) {
+                } else if (!statusDone && statusNew) {
                     epic.setStatus(TaskStatusEnum.NEW);
                 } else {
                     epic.setStatus(TaskStatusEnum.IN_PROGRESS);
                 }
             }
         } else {
-            System.out.println("Epic == null или нет эпика с ID = " + epic.getId());
+            System.out.println("Epic == null или нет такого эпика");
         }
     }
 
