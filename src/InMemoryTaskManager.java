@@ -2,18 +2,23 @@ import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
+    /*
+    @TODO check for double get
+    @TODO clear history in mass clear
+     */
+
     private Map<Integer, Task> tasks;
     private Map<Integer, Subtask> subTasks;
     private Map<Integer, Epic> epics;
     private int lastId;
     private HistoryManager historyManager;
 
-    public InMemoryTaskManager() {
+    public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();
         subTasks = new HashMap<>();
         epics = new HashMap<>();
         lastId = 0;
-        historyManager = Managers.getDefaultHistory();
+        this.historyManager = historyManager;
     }
 
     @Override
@@ -70,6 +75,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTaskById(int id) {
         Task task = tasks.get(id);
         tasks.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
@@ -82,6 +88,8 @@ public class InMemoryTaskManager implements TaskManager {
         epic.deleteSubtask(id);
 
         identifyEpicStatus(epic);
+
+        historyManager.remove(id);
     }
 
     @Override
@@ -89,6 +97,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(id);
         deleteAllEpicSubtasks(epic);
         epics.remove(id);
+        historyManager.remove(id);
     }
 
     /*
@@ -252,6 +261,7 @@ public class InMemoryTaskManager implements TaskManager {
     private void deleteAllEpicSubtasks(Epic epic) {
         for (int id : epic.getSubtasks()) {
             subTasks.remove(id);
+            historyManager.remove(id);
         }
     }
 }
