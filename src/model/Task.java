@@ -1,3 +1,5 @@
+package model;
+
 public class Task {
 
     protected int id;
@@ -54,7 +56,7 @@ public class Task {
         return status;
     }
 
-    protected void setStatus(TaskStatusEnum status) {
+    public void setStatus(TaskStatusEnum status) {
         this.status = status;
     }
 

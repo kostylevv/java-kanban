@@ -1,3 +1,7 @@
+package manager;
+
+import model.*;
+
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -110,7 +114,7 @@ public class InMemoryTaskManager implements TaskManager {
                 result.add(subTasks.get(id));
             }
         } else {
-            System.out.println("Epic == null или нет такого эпика");
+            System.out.println("model.Epic == null или нет такого эпика");
         }
         return result;
     }
@@ -155,7 +159,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (task != null && tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
         } else {
-            System.out.println("Task == null или задачи не существует");
+            System.out.println("model.Task == null или задачи не существует");
         }
     }
 
@@ -166,7 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = getEpicById(task.getIdEpic());
             updateEpicStatus(epic);
         } else {
-            System.out.println("Task == null или задачи не существует");
+            System.out.println("model.Task == null или задачи не существует");
         }
     }
 
@@ -176,7 +180,7 @@ public class InMemoryTaskManager implements TaskManager {
             epics.put(task.getId(), task);
             updateEpicStatus(task);
         } else {
-            System.out.println("Task == null или задачи не существует");
+            System.out.println("model.Task == null или задачи не существует");
         }
     }
 
@@ -189,7 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
             task.setId(getTaskId());
             tasks.put(task.getId(), task);
         } else {
-            System.out.println("Task == null или неверный тип задачи");
+            System.out.println("model.Task == null или неверный тип задачи");
         }
     }
 
@@ -207,7 +211,7 @@ public class InMemoryTaskManager implements TaskManager {
                         "эпика с ID = " + task.getIdEpic());
             }
         } else {
-            System.out.println("Task == null или неверный тип задачи");
+            System.out.println("model.Task == null или неверный тип задачи");
         }
     }
 
@@ -222,7 +226,7 @@ public class InMemoryTaskManager implements TaskManager {
                 System.out.println("Невозможно добавить эпик c несуществующими подзадачами");
             }
         } else {
-            System.out.println("Task == null или неверный тип задачи");
+            System.out.println("model.Task == null или неверный тип задачи");
         }
     }
 
@@ -257,7 +261,7 @@ public class InMemoryTaskManager implements TaskManager {
                 }
             }
         } else {
-            System.out.println("Epic == null или нет такого эпика");
+            System.out.println("model.Epic == null или нет такого эпика");
         }
     }
 

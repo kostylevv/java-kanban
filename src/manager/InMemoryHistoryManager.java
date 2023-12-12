@@ -1,6 +1,11 @@
+package manager;
+
+import model.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private static class Node {
@@ -15,7 +20,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    private HashMap<Integer, Node> history = new HashMap<>();
+    private Map<Integer, Node> history = new HashMap<>();
     private Node first;
     private Node last;
 
