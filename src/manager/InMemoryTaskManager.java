@@ -5,9 +5,9 @@ import model.*;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> tasks;
-    private final Map<Integer, Subtask> subTasks;
-    private final Map<Integer, Epic> epics;
+    protected final Map<Integer, Task> tasks;
+    protected final Map<Integer, Subtask> subTasks;
+    protected final Map<Integer, Epic> epics;
     private int lastId;
     private final HistoryManager historyManager;
 
@@ -85,13 +85,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteSubtaskById(int id) {
         Subtask subtask = subTasks.get(id);
         Epic epic = epics.get(subtask.getIdEpic());
-
         subTasks.remove(id);
-
         epic.deleteSubtask(id);
-
         updateEpicStatus(epic);
-
         historyManager.remove(id);
     }
 

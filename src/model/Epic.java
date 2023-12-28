@@ -35,4 +35,50 @@ public class Epic extends Task {
     public String toString() {
         return super.toString() + ", subtasks = " + Arrays.asList(subtasks.toArray());
     }
+
+    @Override
+    public String serialize() {
+        StringBuilder sb = new StringBuilder(super.serialize());
+        for (int i : subtasks) {
+            sb.append(",");
+            sb.append(i);
+        }
+        return sb.toString();
+    }
+
+    public static Epic fromString(String str) throws IllegalArgumentException {
+        if (str != null && !str.isEmpty()) {
+            String[] words = str.split(",");
+            if (words.length >= 6) {
+                int id = getIdFromString(words[0]);
+
+                TaskTypeEnum type = getTaskTypeFromString(words[1]);
+                if (!type.equals(TaskTypeEnum.EPIC)) {
+                    throw new IllegalArgumentException("Epic should have appropriate type, got " + words[1] + " (raw)");
+                }
+
+                TaskStatusEnum status = getTaskStatusFromString(words[2]);
+
+                Epic result = new Epic(words[3], words[4]);
+                result.id = id;
+                result.status = status;
+                result.subtasks = getSubtasksFromStringArr(Arrays.copyOfRange(words, 5, words.length));
+                return result;
+            } else {
+                throw new IllegalArgumentException("Input string should have >= 6 C-S-V, got " + words.length);
+            }
+        } else throw new IllegalArgumentException("Input string is null or empty");
+    }
+
+    private static Set<Integer> getSubtasksFromStringArr(String[] array) throws IllegalArgumentException {
+        Set<Integer> result = new HashSet<>();
+        for (String s : array) {
+            try {
+                result.add(Integer.parseInt(s));
+            } catch (NumberFormatException nfe) {
+                throw new IllegalArgumentException("Subtask id should be of an int type, got " + s);
+            }
+        }
+        return result;
+    }
 }
