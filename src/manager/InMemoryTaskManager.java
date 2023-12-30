@@ -9,7 +9,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Subtask> subTasks;
     protected final Map<Integer, Epic> epics;
     private int lastId;
-    private final HistoryManager historyManager;
+    protected final HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();

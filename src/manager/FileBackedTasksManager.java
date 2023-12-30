@@ -11,16 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    private final HistoryManager historyManager;
-    private static String fileName;
+    private final String fileName;
     private static final String HEADER = "id,type,status,title,description,id_epic/id_subtasks...";
-    private static Map<Integer, TaskTypeEnum> taskIdTypeMap;
 
     public FileBackedTasksManager(HistoryManager historyManager, String fileName) {
         super(historyManager);
-        this.historyManager = historyManager;
-        FileBackedTasksManager.fileName = fileName;
-        taskIdTypeMap = new HashMap<>();
+        this.fileName = fileName;
     }
 
     public static void main(String[] args) {
@@ -163,49 +159,42 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     switch (words[1].trim().toUpperCase()) {
                         case "TASK" -> {
                             Task t = Task.fromString(str);
-                            taskIdTypeMap.put(t.getId(), t.getType());
                             super.tasks.put(t.getId(), t);
                         }
                         case "SUBTASK" -> {
                             Subtask s = Subtask.fromString(str);
-                            taskIdTypeMap.put(s.getId(), s.getType());
                             super.subTasks.put(s.getId(), s);
                         }
                         case "EPIC" -> {
                             Epic e = Epic.fromString(str);
-                            taskIdTypeMap.put(e.getId(), e.getType());
                             super.epics.put(e.getId(), e);
                         }
-                        default -> throw new IllegalArgumentException("Type should be TASK|SUBTASK|EPIC, got " + words[1]);
+                        default -> throw new ManagerSaveException("Type should be TASK|SUBTASK|EPIC, got " + words[1]);
                     }
                 } else if (parseHistory) {
                     List<Integer> history = historyFromString(str);
                     for (int i : history) {
-                        TaskTypeEnum type = taskIdTypeMap.get(i);
-                        Task t;
-                        if (type == TaskTypeEnum.TASK) {
-                            t = getTaskById(i);
-                        } else if (type == TaskTypeEnum.SUBTASK) {
-                            t = getSubTaskById(i);
-                        } else if (type == TaskTypeEnum.EPIC) {
-                            t = getEpicById(i);
-                        } else {
-                            throw new IllegalArgumentException("Failed to found task with id  " + i);
+                        Task t = tasks.get(i);
+                        if (t == null) {
+                            t = subTasks.get(i);
+                            if (t == null) {
+                                t = epics.get(t);
+                            }
                         }
                         if (t != null) {
                             historyManager.add(t);
                         } else {
-                            throw new IllegalArgumentException("Failed to found task with id  " + i);
+                            throw new ManagerSaveException("Failed to found task with id  " + i);
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new ManagerSaveException(e.getMessage());
         }
     }
 
-    public void save() {
+    private void save() {
         List<Task> tasks = this.getAllTasks();
         tasks.addAll(this.getAllSubtasks());
         tasks.addAll(this.getAllEpics());
@@ -218,12 +207,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
              out.write("\n");
              out.write(historyToString(historyManager));
         } catch (Exception e) {
-             System.out.println(e.getMessage());
-            e.printStackTrace();
+            throw new ManagerSaveException(e.getMessage());
         }
     }
 
-    static List<Integer> historyFromString(String value){
+    private static List<Integer> historyFromString(String value){
         List<Integer> result = new ArrayList<>();
         if (value != null && !value.isEmpty()) {
             String[] words = value.split(",");
@@ -232,14 +220,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     int i = Integer.parseInt(word);
                     result.add(i);
                 } catch (ArithmeticException ae) {
-                    ae.printStackTrace();
+                    throw new ManagerSaveException(ae.getMessage());
                 }
             }
         }
         return result;
     }
 
-    static String historyToString(HistoryManager manager){
+    private static String historyToString(HistoryManager manager){
         List<Task> list = manager.getHistory();
         if (list.size()>0) {
             StringBuilder sb = new StringBuilder();
@@ -256,6 +244,5 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             System.out.println(task.toString());
         }
         System.out.println("--- End of History ---");
-
     }
 }
