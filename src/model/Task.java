@@ -1,21 +1,21 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Task {
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     protected int id;
     protected String title;
     protected String description;
+    protected LocalDateTime startTime;
+    protected Duration duration;
+
     protected TaskStatusEnum status;
     protected final TaskTypeEnum type;
 
-    public Task(String title, String description, TaskStatusEnum status) {
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.type = TaskTypeEnum.TASK;
-    }
-
-    //конструктор для наследников
     public Task(String title, String description, TaskStatusEnum status, TaskTypeEnum type) {
         this.title = title;
         this.description = description;
@@ -23,24 +23,87 @@ public class Task {
         this.type = type;
     }
 
-    public Task(int id, String title, String description, TaskStatusEnum status, TaskTypeEnum type) {
-        this(title, description, status, type);
-        this.id = id;
+    public Task(String title, String description, TaskStatusEnum status) {
+        this(title, description, status, TaskTypeEnum.TASK);
     }
+
+    public Task(String title, String description, TaskStatusEnum status, String startTimeString, long durationMinutes) {
+        this(title, description, status, TaskTypeEnum.TASK);
+        try {
+            LocalDateTime startTime = getTimeFromString(startTimeString);
+            this.startTime = startTime;
+        } catch (IllegalArgumentException iae) {
+            //log parsing error
+        }
+        Duration duration = getDurationFromMinutes(durationMinutes);
+        this.duration = duration;
+    }
+
 
     @Override
     public String toString() {
-        return "ID: " + id + ", title: " + title + ", desc: " + description + ", status: " + status;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("ID: ");
+        stringBuilder.append(id);
+        stringBuilder.append(", ");
+
+        stringBuilder.append("title: ");
+        stringBuilder.append(title);
+        stringBuilder.append(", ");
+
+        stringBuilder.append("desc: ");
+        stringBuilder.append(description);
+        stringBuilder.append(", ");
+
+        stringBuilder.append("status: ");
+        stringBuilder.append(status);
+
+        if (duration != null) {
+            stringBuilder.append(", ");
+            stringBuilder.append("duration: ");
+            stringBuilder.append(duration.toMinutes());
+        }
+
+        if (startTime != null) {
+            stringBuilder.append(", ");
+            stringBuilder.append("start time: ");
+            stringBuilder.append(startTime.format(DATE_TIME_FORMATTER));
+        }
+
+        return stringBuilder.toString();
     }
 
     public String serialize() {
-        return id + "," + type + "," + status + "," + title + "," + description;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(id);
+        stringBuilder.append(",");
+
+        stringBuilder.append(title);
+        stringBuilder.append(",");
+
+        stringBuilder.append(description);
+        stringBuilder.append(",");
+
+        stringBuilder.append(status);
+        stringBuilder.append(",");
+
+        if (duration != null) {
+            stringBuilder.append(duration.toMinutes());
+        }
+        stringBuilder.append(",");
+
+        if (startTime != null) {
+            stringBuilder.append(startTime.format(DATE_TIME_FORMATTER));
+        }
+        stringBuilder.append(",");
+
+        return stringBuilder.toString();
     }
 
     public static Task fromString(String str) throws IllegalArgumentException {
         if (str != null && !str.isEmpty()) {
             String[] words = str.split(",");
-            if (words.length == 5) {
+            if (words.length == 7) {
                 int id = getIdFromString(words[0]);
 
                 TaskTypeEnum type = getTaskTypeFromString(words[1]);
@@ -53,7 +116,7 @@ public class Task {
                 result.id = id;
                 return result;
             } else {
-                throw new IllegalArgumentException("Input string should have exactly 5 C-S-V, got " + words.length);
+                throw new IllegalArgumentException("Input string should have exactly 7 C-S-V, got " + words.length);
             }
         } else throw new IllegalArgumentException("Input string is null or empty");
     }
@@ -122,5 +185,13 @@ public class Task {
             default -> throw new IllegalArgumentException("Task status should be NEW | IN PROGRESS | DONE, got "
                     + s.trim().toUpperCase());
         };
+    }
+
+    protected static Duration getDurationFromMinutes(long minutes) {
+        return Duration.ofMinutes(minutes);
+    }
+
+    protected static LocalDateTime getTimeFromString(String startTime) throws IllegalArgumentException {
+        return LocalDateTime.parse(startTime, DATE_TIME_FORMATTER);
     }
 }
