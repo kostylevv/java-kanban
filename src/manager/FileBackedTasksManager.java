@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
     private final String fileName;
-    private static final String HEADER = "id,type,status,title,description,id_epic/id_subtasks...";
+    private static final String HEADER = "id,type,status,title,description,startTime,duration,id_epic/id_subtasks...";
 
     public FileBackedTasksManager(HistoryManager historyManager, String fileName) {
         super(historyManager);
@@ -22,8 +22,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public static void main(String[] args) {
         FileBackedTasksManager fmgr = (FileBackedTasksManager) Managers.getDefault();
 
-        Task task = new Task("test title task1", "test desc 1", TaskStatusEnum.NEW);
-        Task task1 = new Task("test title taks2", "test desc2 ", TaskStatusEnum.IN_PROGRESS);
+        Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
+        Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
+        task.setDuration(60);
+        task.setStartTime("2024-03-12T16:30:00");
+        System.out.println("T_END:" + task.getEndTime());
+
 
         Epic epic = new Epic("e1", "e1d");
         Epic epic1 = new Epic("e2", "e2d");
@@ -34,9 +38,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         fmgr.addEpic(epic);
         fmgr.addEpic(epic1);
 
-        Subtask subtask = new Subtask("St1", "st1d", TaskStatusEnum.NEW, epic.getId());
-        Subtask subtask1 = new Subtask("St2", "st2d", TaskStatusEnum.NEW, epic.getId());
-        Subtask subtask2 = new Subtask("St3", "st3d", TaskStatusEnum.NEW, epic1.getId());
+        Subtask subtask = new Subtask(TaskStatusEnum.NEW, "St1", "st1d", epic.getId());
+        Subtask subtask1 = new Subtask(TaskStatusEnum.NEW, "St2", "st2d", epic.getId());
+        Subtask subtask2 = new Subtask(TaskStatusEnum.NEW, "St3", "st3d", epic.getId());
 
         fmgr.addSubtask(subtask);
         fmgr.addSubtask(subtask1);
@@ -184,12 +188,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                         if (t != null) {
                             historyManager.add(t);
                         } else {
-                            throw new ManagerSaveException("Failed to found task with id  " + i);
+                            throw new ManagerSaveException("Failed to found task with id=" + i +".");
                         }
                     }
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ManagerSaveException(e.getMessage());
         }
     }

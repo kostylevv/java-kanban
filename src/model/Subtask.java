@@ -3,15 +3,11 @@ package model;
 public class Subtask extends Task {
     private int idEpic;
 
-    public Subtask(String title, String description, TaskStatusEnum status, int idEpic) {
-        super(title, description, status, TaskTypeEnum.SUBTASK);
-        this.idEpic = idEpic;
+    public Subtask(TaskStatusEnum status, String title, String description, int idEpic) {
+        super(TaskTypeEnum.SUBTASK, status, title, description);
+        setIdEpic(idEpic);
     }
 
-    public Subtask(int id, String title, String description, TaskStatusEnum status, int idEpic) {
-        this(title, description, status, idEpic);
-        this.id = id;
-    }
 
     public int getIdEpic() {
         return idEpic;
@@ -28,13 +24,20 @@ public class Subtask extends Task {
 
     @Override
     public String serialize() {
-        return super.serialize() + "," + idEpic;
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.serialize());
+        sb.append(",");
+        sb.append(idEpic);
+        return sb.toString();
     }
 
+
+    // id,type,status,title,description,startTime,duration,idEpic
+    //  0, 1,   2,     3,    4,          5,        6,       7
     public static Subtask fromString(String str) throws IllegalArgumentException {
         if (str != null && !str.isEmpty()) {
-            String[] words = str.split(",");
-            if (words.length == 6) {
+            String[] words = str.split(",", -1);
+            if (words.length == 8) {
                 int id = getIdFromString(words[0]);
 
                 TaskTypeEnum type = getTaskTypeFromString(words[1]);
@@ -43,10 +46,17 @@ public class Subtask extends Task {
                 }
 
                 TaskStatusEnum status = getTaskStatusFromString(words[2]);
-                int idEpic = getIdFromString(words[5]);
-                return new Subtask(id, words[3], words[4], status, idEpic);
+                int idEpic = getIdFromString(words[7]);
+                Subtask result = new Subtask(status, words[3], words[4], idEpic);
+                result.id = id;
+                result.setIdEpic(idEpic);
+                result.setStartTime(words[5]);
+                result.setDuration(words[6]);
+
+
+                return result;
             } else {
-                throw new IllegalArgumentException("Input string should have exactly 6 C-S-V, got " + words.length);
+                throw new IllegalArgumentException("Input string should have exactly 8 C-S-V, got " + words.length);
             }
         } else throw new IllegalArgumentException("Input string is null or empty");
     }

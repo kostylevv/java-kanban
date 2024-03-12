@@ -3,48 +3,86 @@ package model;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Task {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     protected int id;
+    protected final TaskTypeEnum type;
+    protected TaskStatusEnum status;
     protected String title;
     protected String description;
     protected LocalDateTime startTime;
     protected Duration duration;
 
-    protected TaskStatusEnum status;
-    protected final TaskTypeEnum type;
+    public LocalDateTime getEndTime() {
+        if (startTime != null && duration != null) {
+            return startTime.plusMinutes(duration.toMinutes());
+        } else return null;
+    }
 
-    public Task(String title, String description, TaskStatusEnum status, TaskTypeEnum type) {
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTimeString) {
+        try {
+            LocalDateTime startTime = getTimeFromString(startTimeString);
+            this.startTime = startTime;
+        } catch (DateTimeParseException e) {
+            //log exception
+        }
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long durationLong) {
+        try {
+            Duration duration = Duration.ofMinutes(durationLong);
+            this.duration = duration;
+        } catch (ArithmeticException e) {
+            //log exception
+        }
+    }
+
+    public void setDuration(String durationString) {
+        try {
+            long durationLong = Long.parseLong(durationString);
+            setDuration(durationLong);
+        } catch (NumberFormatException e) {
+            //log exception
+        }
+    }
+
+
+
+    public Task(TaskTypeEnum type, TaskStatusEnum status, String title, String description) {
         this.title = title;
         this.description = description;
         this.status = status;
         this.type = type;
     }
 
-    public Task(String title, String description, TaskStatusEnum status) {
-        this(title, description, status, TaskTypeEnum.TASK);
+    public Task(TaskStatusEnum status, String title, String description) {
+        this(TaskTypeEnum.TASK, status, title, description);
     }
-
-    public Task(String title, String description, TaskStatusEnum status, String startTimeString, long durationMinutes) {
-        this(title, description, status, TaskTypeEnum.TASK);
-        try {
-            LocalDateTime startTime = getTimeFromString(startTimeString);
-            this.startTime = startTime;
-        } catch (IllegalArgumentException iae) {
-            //log parsing error
-        }
-        Duration duration = getDurationFromMinutes(durationMinutes);
-        this.duration = duration;
-    }
-
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("ID: ");
         stringBuilder.append(id);
+        stringBuilder.append(", ");
+
+        stringBuilder.append("type: ");
+        stringBuilder.append(type);
+        stringBuilder.append(", ");
+
+        stringBuilder.append("status: ");
+        stringBuilder.append(status);
         stringBuilder.append(", ");
 
         stringBuilder.append("title: ");
@@ -55,19 +93,15 @@ public class Task {
         stringBuilder.append(description);
         stringBuilder.append(", ");
 
-        stringBuilder.append("status: ");
-        stringBuilder.append(status);
-
-        if (duration != null) {
-            stringBuilder.append(", ");
-            stringBuilder.append("duration: ");
-            stringBuilder.append(duration.toMinutes());
-        }
-
+        stringBuilder.append("start: ");
         if (startTime != null) {
-            stringBuilder.append(", ");
-            stringBuilder.append("start time: ");
             stringBuilder.append(startTime.format(DATE_TIME_FORMATTER));
+        }
+        stringBuilder.append(",");
+
+        stringBuilder.append("duration: ");
+        if (duration != null) {
+            stringBuilder.append(duration.toMinutes());
         }
 
         return stringBuilder.toString();
@@ -78,18 +112,16 @@ public class Task {
         stringBuilder.append(id);
         stringBuilder.append(",");
 
-        stringBuilder.append(title);
-        stringBuilder.append(",");
-
-        stringBuilder.append(description);
+        stringBuilder.append(type);
         stringBuilder.append(",");
 
         stringBuilder.append(status);
         stringBuilder.append(",");
 
-        if (duration != null) {
-            stringBuilder.append(duration.toMinutes());
-        }
+        stringBuilder.append(title);
+        stringBuilder.append(",");
+
+        stringBuilder.append(description);
         stringBuilder.append(",");
 
         if (startTime != null) {
@@ -97,12 +129,26 @@ public class Task {
         }
         stringBuilder.append(",");
 
+        if (duration != null) {
+            stringBuilder.append(duration.toMinutes());
+        }
+
         return stringBuilder.toString();
     }
 
+    /**
+     *
+     * id,type,status,title,description,startTime,duration
+     * 0, 1,   2,     3,    4,          5,        6
+     *
+     * @param str
+     * @return
+     * @throws IllegalArgumentException
+     */
+
     public static Task fromString(String str) throws IllegalArgumentException {
         if (str != null && !str.isEmpty()) {
-            String[] words = str.split(",");
+            String[] words = str.split(",", -1);
             if (words.length == 7) {
                 int id = getIdFromString(words[0]);
 
@@ -112,8 +158,12 @@ public class Task {
                 }
 
                 TaskStatusEnum status = getTaskStatusFromString(words[2]);
-                Task result = new Task(words[3], words[4], status);
+                Task result = new Task(status, words[3], words[4]);
                 result.id = id;
+                result.setStartTime(words[5]);
+
+                result.setDuration(words[6]);
+
                 return result;
             } else {
                 throw new IllegalArgumentException("Input string should have exactly 7 C-S-V, got " + words.length);
@@ -187,11 +237,7 @@ public class Task {
         };
     }
 
-    protected static Duration getDurationFromMinutes(long minutes) {
-        return Duration.ofMinutes(minutes);
-    }
-
-    protected static LocalDateTime getTimeFromString(String startTime) throws IllegalArgumentException {
+    protected static LocalDateTime getTimeFromString(String startTime) throws DateTimeParseException {
         return LocalDateTime.parse(startTime, DATE_TIME_FORMATTER);
     }
 }

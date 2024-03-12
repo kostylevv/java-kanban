@@ -9,7 +9,7 @@ public class Epic extends Task {
     private Set<Integer> subtasks; //эпик знает ID подзадач, но не хранит их
 
     public Epic(String title, String description) {
-        super(title, description, TaskStatusEnum.NEW, TaskTypeEnum.EPIC);
+        super(TaskTypeEnum.EPIC, TaskStatusEnum.NEW, title, description);
         this.subtasks = new HashSet<>();
     }
 
@@ -46,10 +46,12 @@ public class Epic extends Task {
         return sb.toString();
     }
 
+    // id,type,status,title,description,startTime,duration,idSubtask...
+    //  0, 1,   2,     3,    4,          5,        6,       7
     public static Epic fromString(String str) throws IllegalArgumentException {
         if (str != null && !str.isEmpty()) {
-            String[] words = str.split(",");
-            if (words.length >= 6) {
+            String[] words = str.split(",", -1);
+            if (words.length >= 7) {
                 int id = getIdFromString(words[0]);
 
                 TaskTypeEnum type = getTaskTypeFromString(words[1]);
@@ -62,10 +64,11 @@ public class Epic extends Task {
                 Epic result = new Epic(words[3], words[4]);
                 result.id = id;
                 result.status = status;
-                result.subtasks = getSubtasksFromStringArr(Arrays.copyOfRange(words, 5, words.length));
+                result.subtasks = getSubtasksFromStringArr(Arrays.copyOfRange(words, 7, words.length));
+
                 return result;
             } else {
-                throw new IllegalArgumentException("Input string should have >= 6 C-S-V, got " + words.length);
+                throw new IllegalArgumentException("Input string should have >= 7 C-S-V, got " + words.length);
             }
         } else throw new IllegalArgumentException("Input string is null or empty");
     }
