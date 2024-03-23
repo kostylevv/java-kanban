@@ -1,21 +1,28 @@
 package model;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class Epic extends Task {
 
     private Set<Integer> subtasks; //эпик знает ID подзадач, но не хранит их
+    private LocalDateTime endTime;
 
     public Epic(String title, String description) {
         super(TaskTypeEnum.EPIC, TaskStatusEnum.NEW, title, description);
         this.subtasks = new HashSet<>();
     }
 
+    public void setEndTime(Optional<LocalDateTime> endTime) {
+        if (endTime.isPresent()) {
+            this.endTime = endTime.get();
+        }
+    }
+
     public Set<Integer> getSubtasks() {
         return subtasks;
     }
+
 
     public void setSubtasks(Set<Integer> subtasks) {
         this.subtasks = subtasks;

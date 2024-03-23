@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 
 public class Task {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -16,33 +17,59 @@ public class Task {
     protected LocalDateTime startTime;
     protected Duration duration;
 
-    public LocalDateTime getEndTime() {
-        if (startTime != null && duration != null) {
-            return startTime.plusMinutes(duration.toMinutes());
-        } else return null;
+    public Task(TaskTypeEnum type, TaskStatusEnum status, String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.type = type;
     }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
+    public Task(TaskStatusEnum status, String title, String description) {
+        this(TaskTypeEnum.TASK, status, title, description);
+    }
+
+    public Task(String title, String description) {
+        this(TaskTypeEnum.TASK, TaskStatusEnum.NEW, title, description);
+    }
+
+    public Optional<LocalDateTime> getEndTime() {
+        return Optional.ofNullable(startTime.plusMinutes(duration.toMinutes()));
+    }
+
+    public Optional<LocalDateTime> getStartTime() {
+        return Optional.ofNullable(startTime);
+    }
+
+    public void setStartTime(Optional<LocalDateTime> startTime) {
+        if (startTime.isPresent()) {
+            this.startTime = startTime.get();
+        }
     }
 
     public void setStartTime(String startTimeString) {
         try {
-            LocalDateTime startTime = getTimeFromString(startTimeString);
-            this.startTime = startTime;
+            LocalDateTime startTime = LocalDateTime.parse(startTimeString.trim(), DATE_TIME_FORMATTER);
+            this.setStartTime(Optional.ofNullable(startTime));
         } catch (DateTimeParseException e) {
             //log exception
+            e.printStackTrace();
         }
     }
 
-    public Duration getDuration() {
-        return duration;
+    public Optional<Duration> getDuration() {
+        return Optional.ofNullable(duration);
+    }
+
+    public void setDuration(Duration duration) {
+        if (duration != null) {
+            this.duration = duration;
+        }
     }
 
     public void setDuration(long durationLong) {
         try {
             Duration duration = Duration.ofMinutes(durationLong);
-            this.duration = duration;
+            setDuration(duration);
         } catch (ArithmeticException e) {
             //log exception
         }
@@ -55,19 +82,6 @@ public class Task {
         } catch (NumberFormatException e) {
             //log exception
         }
-    }
-
-
-
-    public Task(TaskTypeEnum type, TaskStatusEnum status, String title, String description) {
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.type = type;
-    }
-
-    public Task(TaskStatusEnum status, String title, String description) {
-        this(TaskTypeEnum.TASK, status, title, description);
     }
 
     @Override
@@ -85,6 +99,10 @@ public class Task {
         stringBuilder.append(status);
         stringBuilder.append(", ");
 
+        stringBuilder.append("Type: ");
+        stringBuilder.append(type);
+        stringBuilder.append(", ");
+
         stringBuilder.append("title: ");
         stringBuilder.append(title);
         stringBuilder.append(", ");
@@ -94,13 +112,13 @@ public class Task {
         stringBuilder.append(", ");
 
         stringBuilder.append("start: ");
-        if (startTime != null) {
+        if (getStartTime().isPresent()) {
             stringBuilder.append(startTime.format(DATE_TIME_FORMATTER));
         }
         stringBuilder.append(",");
 
         stringBuilder.append("duration: ");
-        if (duration != null) {
+        if (getDuration().isPresent()) {
             stringBuilder.append(duration.toMinutes());
         }
 
@@ -122,14 +140,14 @@ public class Task {
         stringBuilder.append(",");
 
         stringBuilder.append(description);
-        stringBuilder.append(",");
+        stringBuilder.append(" ,");
 
-        if (startTime != null) {
+        if (getStartTime().isPresent()) {
             stringBuilder.append(startTime.format(DATE_TIME_FORMATTER));
         }
-        stringBuilder.append(",");
+        stringBuilder.append(" ,");
 
-        if (duration != null) {
+        if (getDuration().isPresent()) {
             stringBuilder.append(duration.toMinutes());
         }
 
@@ -160,9 +178,13 @@ public class Task {
                 TaskStatusEnum status = getTaskStatusFromString(words[2]);
                 Task result = new Task(status, words[3], words[4]);
                 result.id = id;
-                result.setStartTime(words[5]);
+                if (!words[5].isBlank()) {
+                    result.setStartTime(words[5]);
+                }
 
-                result.setDuration(words[6]);
+                if (!words[6].isBlank()) {
+                    result.setDuration(words[6]);
+                }
 
                 return result;
             } else {
@@ -235,9 +257,5 @@ public class Task {
             default -> throw new IllegalArgumentException("Task status should be NEW | IN PROGRESS | DONE, got "
                     + s.trim().toUpperCase());
         };
-    }
-
-    protected static LocalDateTime getTimeFromString(String startTime) throws DateTimeParseException {
-        return LocalDateTime.parse(startTime, DATE_TIME_FORMATTER);
     }
 }

@@ -8,7 +8,6 @@ public class Subtask extends Task {
         setIdEpic(idEpic);
     }
 
-
     public int getIdEpic() {
         return idEpic;
     }
@@ -50,9 +49,14 @@ public class Subtask extends Task {
                 Subtask result = new Subtask(status, words[3], words[4], idEpic);
                 result.id = id;
                 result.setIdEpic(idEpic);
-                result.setStartTime(words[5]);
-                result.setDuration(words[6]);
 
+                if (!words[5].isBlank()) {
+                    result.setStartTime(words[5]);
+                }
+
+                if (!words[6].isBlank()) {
+                    result.setDuration(words[6]);
+                }
 
                 return result;
             } else {

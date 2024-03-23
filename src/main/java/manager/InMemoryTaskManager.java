@@ -2,6 +2,8 @@ package manager;
 
 import model.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -258,6 +260,30 @@ public class InMemoryTaskManager implements TaskManager {
             }
         } else {
             System.out.println("model.Epic == null или нет такого эпика");
+        }
+    }
+
+    private void setEpicTimeBound(Epic epic) {
+        if (epic != null && epics.containsKey(epic.getId())) {
+
+            epic.setStartTime(getSubtasks(epic).stream()
+                    .map(Subtask::getStartTime)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .min(LocalDateTime::compareTo));
+
+            epic.setEndTime(getSubtasks(epic).stream()
+                    .map(Subtask::getEndTime)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .max(LocalDateTime::compareTo)
+            );
+
+            epic.setDuration(getSubtasks(epic).stream()
+                    .map(Subtask::getDuration)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .reduce(Duration.ZERO, Duration::plus));
         }
     }
 
