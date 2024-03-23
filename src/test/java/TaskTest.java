@@ -3,6 +3,8 @@ import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -59,5 +61,32 @@ public class TaskTest {
         manager.deleteAllTasks();
 
         assertTrue(manager.getAllTasks().size() == 0);
+    }
+
+    @Test
+    public void startTimeIsSet() {
+        Task task = new Task("test title task1", "test desc 1");
+        assertTrue(task.getStartTime().isEmpty());
+        task.setStartTime("2024-03-23T20:00:00");
+        LocalDateTime localDateTime = LocalDateTime.parse("2024-03-23T20:00:00");
+        assertTrue(task.getStartTime().get().equals(localDateTime));
+    }
+
+    @Test
+    public void durationIsSet() {
+        Task task = new Task("test title task1", "test desc 1");
+        assertTrue(task.getDuration().isEmpty());
+        task.setDuration(60);
+        assertTrue(task.getDuration().get().toMinutes() == 60);
+    }
+
+    @Test
+    public void endTimeIsSet() {
+        Task task = new Task("test title task1", "test desc 1");
+        assertTrue(task.getEndTime().isEmpty());
+        task.setStartTime("2024-03-23T20:00:00");
+        task.setDuration(60);
+        LocalDateTime localDateTime = LocalDateTime.parse("2024-03-23T21:00:00");
+        assertTrue(task.getEndTime().get().equals(localDateTime));
     }
 }

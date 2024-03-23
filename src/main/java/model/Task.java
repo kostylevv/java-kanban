@@ -33,7 +33,11 @@ public class Task {
     }
 
     public Optional<LocalDateTime> getEndTime() {
-        return Optional.ofNullable(startTime.plusMinutes(duration.toMinutes()));
+        if (getStartTime().isPresent() && getDuration().isPresent()) {
+            return Optional.of(startTime.plusMinutes(duration.toMinutes()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public Optional<LocalDateTime> getStartTime() {
