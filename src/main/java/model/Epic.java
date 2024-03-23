@@ -13,9 +13,20 @@ public class Epic extends Task {
         this.subtasks = new HashSet<>();
     }
 
+    @Override
+    public Optional<LocalDateTime> getEndTime() {
+        if (endTime != null) {
+            return Optional.of(endTime);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public void setEndTime(Optional<LocalDateTime> endTime) {
         if (endTime.isPresent()) {
             this.endTime = endTime.get();
+        } else {
+            this.endTime = null;
         }
     }
 

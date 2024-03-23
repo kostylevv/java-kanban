@@ -6,6 +6,8 @@ import model.TaskStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EpicTest {
@@ -61,5 +63,44 @@ public class EpicTest {
         manager.deleteAllEpics();
 
         assertTrue(manager.getAllEpics().size() == 0);
+    }
+
+    @Test
+    public void timeBoundsAreSet() {
+        Epic epic = new Epic("e1", "e1d");
+        manager.addEpic(epic);
+        assertTrue(epic.getStartTime().isEmpty());
+        assertTrue(epic.getDuration().get().isZero());
+        assertTrue(epic.getEndTime().isEmpty());
+
+        Subtask task = new Subtask("test title task1", "test desc 1", epic.getId());
+        Subtask task2 = new Subtask("test title task2", "test desc 2", epic.getId());
+        Subtask task3 = new Subtask("test title task3", "test desc 3", epic.getId());
+
+        task.setStartTime("2024-03-23T20:00:00");
+        task.setDuration(60);
+
+        task2.setStartTime("2024-03-25T20:00:00");
+        task2.setDuration(60);
+
+        task3.setStartTime("2024-03-26T20:00:00");
+        task3.setDuration(60);
+
+        manager.addSubtask(task2);
+        manager.addSubtask(task);
+        manager.addSubtask(task3);
+
+        assertTrue(epic.getEndTime().isPresent(), epic.getEndTime().get().toString());
+        assertTrue(epic.getDuration().get().toMinutes() == 180);
+        assertTrue(epic.getStartTime().get().equals(LocalDateTime.parse("2024-03-23T20:00:00")));
+        assertTrue(epic.getEndTime().get().equals(LocalDateTime.parse("2024-03-26T21:00:00")));
+
+        manager.deleteSubtaskById(task3.getId());
+        assertTrue(epic.getEndTime().get().equals(LocalDateTime.parse("2024-03-25T21:00:00")));
+
+        manager.deleteAllSubTasks();
+        assertTrue(epic.getStartTime().isEmpty());
+        assertTrue(epic.getDuration().get().isZero());
+        assertTrue(epic.getEndTime().isEmpty());
     }
 }

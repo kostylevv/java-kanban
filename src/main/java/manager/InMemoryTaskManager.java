@@ -234,6 +234,8 @@ public class InMemoryTaskManager implements TaskManager {
     private void updateEpicStatus(Epic epic) {
         if (epic != null && epics.containsKey(epic.getId())) {
             List<Subtask> subtasks = getSubtasks(epic);
+            setEpicTimeBound(epic);
+
             if (subtasks.isEmpty()) {
                 epic.setStatus(TaskStatusEnum.NEW);
             } else {
@@ -257,6 +259,7 @@ public class InMemoryTaskManager implements TaskManager {
                 } else {
                     epic.setStatus(TaskStatusEnum.IN_PROGRESS);
                 }
+
             }
         } else {
             System.out.println("model.Epic == null или нет такого эпика");

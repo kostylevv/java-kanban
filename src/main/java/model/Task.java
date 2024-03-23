@@ -47,6 +47,8 @@ public class Task {
     public void setStartTime(Optional<LocalDateTime> startTime) {
         if (startTime.isPresent()) {
             this.startTime = startTime.get();
+        } else {
+            this.startTime = null;
         }
     }
 
@@ -67,6 +69,8 @@ public class Task {
     public void setDuration(Duration duration) {
         if (duration != null) {
             this.duration = duration;
+        } else {
+            this.duration = null;
         }
     }
 
