@@ -8,6 +8,11 @@ public class Subtask extends Task {
         setIdEpic(idEpic);
     }
 
+    public Subtask(String title, String description, int idEpic) {
+        super(TaskTypeEnum.SUBTASK, TaskStatusEnum.NEW, title, description);
+        setIdEpic(idEpic);
+    }
+
     public int getIdEpic() {
         return idEpic;
     }
