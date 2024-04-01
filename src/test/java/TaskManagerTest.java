@@ -104,4 +104,31 @@ class TaskManagerTest<T extends TaskManager> {
         assertEquals(manager.getPrioritizedTasks().size(), 1);
     }
 
+    @Test
+    public void taskOverlapTest() {
+        Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
+        Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
+        task.setDuration(60);
+        task.setStartTime("2024-03-29T16:30:00");
+        task1.setDuration(60);
+        task1.setStartTime("2024-03-12T16:30:00");
+        manager.addTask(task);
+        manager.addTask(task1);
+
+        assertFalse(manager.isTasksOverlap(task, task1));
+
+        task1.setStartTime("2024-03-29T16:30:00");
+
+        assertTrue(manager.isTasksOverlap(task1, task));
+
+        task.setStartTime("2024-03-29T16:55:00");
+
+        assertTrue(manager.isTasksOverlap(task1, task));
+
+        task1.setDuration(24);
+
+        assertFalse(manager.isTasksOverlap(task, task1));
+
+    }
+
 }

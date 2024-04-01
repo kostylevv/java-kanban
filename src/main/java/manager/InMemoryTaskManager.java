@@ -250,10 +250,32 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    @Override
     public List<Task> getPrioritizedTasks() {
         System.out.println(prioritizedTasks.size());
         return prioritizedTasks.stream().toList();
     }
+
+    @Override
+    public boolean isTasksOverlap(Task t1, Task t2) {
+        if (t1.getStartTime().isEmpty() || t2.getStartTime().isEmpty()) {
+            return false;
+        }
+        if (t1.getDuration().isEmpty() || t2.getDuration().isEmpty()) {
+            return false;
+        }
+
+        if (t1.getStartTime().get().isEqual(t2.getStartTime().get())) {
+            return true;
+        }
+
+        if (t1.getStartTime().get().isBefore(t2.getStartTime().get()) &&
+                t1.getEndTime().get().isAfter(t2.getEndTime().get())) {
+            return true;
+        } else return t2.getEndTime().get().isAfter(t1.getEndTime().get());
+
+    }
+
 
     /*
     Метод следит за статусом эпика исходя из статусов подзадач
@@ -330,7 +352,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     private static void addWithPriority(Task task) {
         if (task.getStartTime().isPresent()) {
-            System.out.println(prioritizedTasks.add(task));
+            prioritizedTasks.add(task);
         }
     }
 
