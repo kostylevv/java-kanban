@@ -58,4 +58,6 @@ public interface TaskManager {
     Получение истории просмотров задач
      */
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }

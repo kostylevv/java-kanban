@@ -5,10 +5,7 @@ import model.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
     private final String fileName;
@@ -25,8 +22,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
         Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
         task.setDuration(60);
-        task.setStartTime("2024-03-12T16:30:00");
-        System.out.println("T_END:" + task.getEndTime());
+        task.setStartTime("2024-03-29T16:30:00");
+        task1.setDuration(60);
+        task1.setStartTime("2024-03-12T16:30:00");
+
+
 
 
         Epic epic = new Epic("e1", "e1d");
@@ -41,10 +41,19 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Subtask subtask = new Subtask(TaskStatusEnum.NEW, "St1", "st1d", epic.getId());
         Subtask subtask1 = new Subtask(TaskStatusEnum.NEW, "St2", "st2d", epic.getId());
         Subtask subtask2 = new Subtask(TaskStatusEnum.NEW, "St3", "st3d", epic.getId());
+        subtask.setDuration(60);
+        subtask.setStartTime("2024-03-15T16:30:00");
 
         fmgr.addSubtask(subtask);
         fmgr.addSubtask(subtask1);
         fmgr.addSubtask(subtask2);
+
+        System.out.println("---------------------");
+        System.out.println("with priority");
+
+        for (Task t : fmgr.getPrioritizedTasks()) {
+            System.out.println(t.toString());
+        }
 
         fmgr.getTaskById(1);
         fmgr.getTaskById(2);
@@ -92,6 +101,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             System.out.println(t.toString());
         }
         printHistory(fmgrRestored);
+
+
     }
 
     @Override
