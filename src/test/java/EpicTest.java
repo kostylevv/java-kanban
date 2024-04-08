@@ -43,11 +43,11 @@ public class EpicTest {
         manager.addEpic(epic2);
         manager.addEpic(epic3);
 
-        assertTrue(manager.getAllEpics().size() == 3);
+        assertEquals(3, manager.getAllEpics().size());
 
         manager.deleteEpicById(2);
 
-        assertTrue(manager.getEpicById(2) == null);
+        assertNull(manager.getEpicById(2));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class EpicTest {
 
         manager.deleteAllEpics();
 
-        assertTrue(manager.getAllEpics().size() == 0);
+        assertEquals(0, manager.getAllEpics().size());
     }
 
     @Test
@@ -91,12 +91,13 @@ public class EpicTest {
         manager.addSubtask(task3);
 
         assertTrue(epic.getEndTime().isPresent(), epic.getEndTime().get().toString());
-        assertTrue(epic.getDuration().get().toMinutes() == 180);
-        assertTrue(epic.getStartTime().get().equals(LocalDateTime.parse("2024-03-23T20:00:00")));
-        assertTrue(epic.getEndTime().get().equals(LocalDateTime.parse("2024-03-26T21:00:00")));
+        assertEquals(180, epic.getDuration().get().toMinutes());
+        System.out.println(epic.getDuration().get().toMinutes());
+        assertEquals(epic.getStartTime().get(), LocalDateTime.parse("2024-03-23T20:00:00"));
+        assertEquals(epic.getEndTime().get(), LocalDateTime.parse("2024-03-26T21:00:00"));
 
         manager.deleteSubtaskById(task3.getId());
-        assertTrue(epic.getEndTime().get().equals(LocalDateTime.parse("2024-03-25T21:00:00")));
+        assertEquals(epic.getEndTime().get(), LocalDateTime.parse("2024-03-25T21:00:00"));
 
         manager.deleteAllSubTasks();
         assertTrue(epic.getStartTime().isEmpty());

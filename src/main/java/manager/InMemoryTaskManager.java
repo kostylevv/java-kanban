@@ -5,6 +5,7 @@ import model.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Task> tasks;
@@ -120,15 +121,16 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public List<Subtask> getSubtasks(Epic epic) {
-        List<Subtask> result = new ArrayList<>();
         if (epic != null && epics.containsKey(epic.getId())) {
-            for (int id : epic.getSubtasks()) {
-                result.add(subTasks.get(id));
-            }
+            return subTasks.entrySet().stream()
+                    .filter(e -> epic.getSubtasks().contains(e.getKey()))
+                    .map(Map.Entry::getValue)
+                    .collect(Collectors.toList());
+
         } else {
             System.out.println("model.Epic == null или нет такого эпика");
+            return new ArrayList<>();
         }
-        return result;
     }
 
     /*
@@ -208,9 +210,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) {
         if (task != null && task.getType() == TaskTypeEnum.TASK) {
-            task.setId(getTaskId());
-            tasks.put(task.getId(), task);
-            addWithPriority(task);
+            boolean overlapTask = tasks.entrySet().stream().anyMatch(t -> isTasksOverlap(t.getValue(), task));
+            boolean overlapSubtask = subTasks.entrySet().stream().anyMatch(t -> isTasksOverlap(t.getValue(), task));
+
+            if (!overlapTask && !overlapSubtask) {
+                task.setId(getTaskId());
+                tasks.put(task.getId(), task);
+                addWithPriority(task);
+            } else {
+                System.out.println("Задача " + task + " пересекается с уже существующей задачей. Невозможно добавить");
+            }
         } else {
             System.out.println("model.Task == null или неверный тип задачи");
         }
@@ -220,12 +229,19 @@ public class InMemoryTaskManager implements TaskManager {
     public void addSubtask(Subtask task) {
         if (task != null && task.getType() == TaskTypeEnum.SUBTASK) {
             if (epics.containsKey(task.getIdEpic())) {
-                task.setId(getTaskId());
-                subTasks.put(task.getId(), task);
-                Epic epic = epics.get(task.getIdEpic());
-                epic.addSubtask(task.getId());
-                updateEpicStatus(epic);
-                addWithPriority(task);
+                boolean overlapTask = tasks.entrySet().stream().anyMatch(t -> isTasksOverlap(t.getValue(), task));
+                boolean overlapSubtask = subTasks.entrySet().stream().anyMatch(t -> isTasksOverlap(t.getValue(), task));
+
+                if (!overlapTask && !overlapSubtask) {
+                    task.setId(getTaskId());
+                    subTasks.put(task.getId(), task);
+                    Epic epic = epics.get(task.getIdEpic());
+                    epic.addSubtask(task.getId());
+                    updateEpicStatus(epic);
+                    addWithPriority(task);
+                } else {
+                    System.out.println("Задача " + task + " пересекается с уже существующей задачей. Невозможно добавить");
+                }
             } else {
                 System.out.println("Невозможно добавить подзадачу для несуществующего " +
                         "эпика с ID = " + task.getIdEpic());
@@ -258,10 +274,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public boolean isTasksOverlap(Task t1, Task t2) {
-        if (t1.getStartTime().isEmpty() || t2.getStartTime().isEmpty()) {
-            return false;
-        }
-        if (t1.getDuration().isEmpty() || t2.getDuration().isEmpty()) {
+        if (t1.getStartTime().isEmpty() || t2.getStartTime().isEmpty() ||
+                t1.getDuration().isEmpty() || t2.getDuration().isEmpty()) {
             return false;
         }
 
@@ -269,13 +283,12 @@ public class InMemoryTaskManager implements TaskManager {
             return true;
         }
 
-        if (t1.getStartTime().get().isBefore(t2.getStartTime().get()) &&
-                t1.getEndTime().get().isAfter(t2.getEndTime().get())) {
-            return true;
-        } else return t2.getEndTime().get().isAfter(t1.getEndTime().get());
-
+        if (t1.getStartTime().get().isBefore(t2.getStartTime().get())) {
+            return t1.getEndTime().get().isAfter(t2.getStartTime().get());
+        } else {
+            return t2.getEndTime().get().isAfter(t1.getStartTime().get());
+        }
     }
-
 
     /*
     Метод следит за статусом эпика исходя из статусов подзадач
