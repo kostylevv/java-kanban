@@ -15,7 +15,6 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HistoryManager historyManager;
     private static TreeSet<Task> prioritizedTasks;
 
-
     public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();
         subTasks = new HashMap<>();
@@ -30,7 +29,6 @@ public class InMemoryTaskManager implements TaskManager {
                     }
                     return 0;
                 });
-
     }
 
     @Override

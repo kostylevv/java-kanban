@@ -99,8 +99,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             System.out.println(t.toString());
         }
         printHistory(fmgrRestored);
-
-
     }
 
     @Override
