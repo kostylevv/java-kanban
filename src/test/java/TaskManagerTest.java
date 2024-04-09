@@ -19,6 +19,94 @@ class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
+    public void getAllTasksTest() {
+        Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
+        Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
+        Task task2 = new Task(TaskStatusEnum.NEW, "test title task8", "test desc 1");
+        Task task3 = new Task("test title taks2", "test desc2 ");
+        assertEquals(manager.getAllTasks().size(),0);
+        manager.addTask(task);
+        manager.addTask(task1);
+        manager.addTask(task2);
+        manager.addTask(task3);
+        assertEquals(manager.getAllTasks().size(),4);
+    }
+
+    @Test
+    public void getAllSubtasksTest() {
+        Epic epic = new Epic("e1", "e1d");
+        Epic epic1 = new Epic("e2", "e2d");
+
+        manager.addEpic(epic);
+        manager.addEpic(epic1);
+
+        Subtask subtask = new Subtask(TaskStatusEnum.NEW, "St1", "st1d", epic.getId());
+        Subtask subtask1 = new Subtask(TaskStatusEnum.NEW, "St2", "st2d", epic.getId());
+        Subtask subtask2 = new Subtask(TaskStatusEnum.NEW, "St3", "st3d", epic1.getId());
+        Subtask subtask3 = new Subtask(TaskStatusEnum.NEW, "St3", "st3d", epic1.getId());
+        Subtask subtask4 = new Subtask(TaskStatusEnum.NEW, "St3", "st3d", epic1.getId());
+
+        assertEquals(manager.getAllSubtasks().size(),0);
+        manager.addSubtask(subtask);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
+        manager.addSubtask(subtask4);
+        assertEquals(manager.getAllSubtasks().size(),5);
+    }
+
+    @Test
+    public void getAllEpicsTest() {
+        Epic epic = new Epic("e1", "e1d");
+        Epic epic1 = new Epic("e2", "e2d");
+
+        assertEquals(manager.getAllEpics().size(),0);
+        manager.addEpic(epic);
+        manager.addEpic(epic1);
+        assertEquals(manager.getAllEpics().size(),2);
+    }
+
+    private void idTestsSetup() {
+        Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
+        Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
+
+        Epic epic = new Epic("e1", "e1d");
+        Epic epic1 = new Epic("e2", "e2d");
+
+        manager.addTask(task);
+        manager.addTask(task1);
+
+        manager.addEpic(epic);
+        manager.addEpic(epic1);
+
+        Subtask subtask = new Subtask(TaskStatusEnum.NEW, "St1", "st1d", epic.getId());
+        Subtask subtask1 = new Subtask(TaskStatusEnum.NEW, "St2", "st2d", epic.getId());
+        Subtask subtask2 = new Subtask(TaskStatusEnum.NEW, "St3", "st3d", epic.getId());
+
+        manager.addSubtask(subtask);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+    }
+
+    @Test
+    public void getTaskByIdTest() {
+        idTestsSetup();
+        assertEquals(manager.getTaskById(1).getTitle(), "test title task1");
+    }
+
+    @Test
+    public void getSubtaskByIdTest() {
+        idTestsSetup();
+        assertEquals(manager.getSubTaskById(6).getTitle(), "St2");
+    }
+
+    @Test
+    public void getEpicByIdTest() {
+        idTestsSetup();
+        assertEquals(manager.getEpicById(3).getTitle(), "e1");
+    }
+
+    @Test
     public void tasksAreAddedWithPriority() {
         Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
         Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
