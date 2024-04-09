@@ -34,7 +34,6 @@ public class Epic extends Task {
         return subtasks;
     }
 
-
     public void setSubtasks(Set<Integer> subtasks) {
         this.subtasks = subtasks;
     }
@@ -47,7 +46,9 @@ public class Epic extends Task {
         subtasks.remove(id);
     }
 
-    public void clearSubtasks() {subtasks.clear();}
+    public void clearSubtasks() {
+        subtasks.clear();
+    }
 
     @Override
     public String toString() {

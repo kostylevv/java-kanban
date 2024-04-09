@@ -11,21 +11,27 @@ public interface TaskManager {
     Получение списков всех задач
      */
     List<Task> getAllTasks();
+
     List<Subtask> getAllSubtasks();
+
     List<Epic> getAllEpics();
 
     /*
     Получение задач по идентификатору
      */
     Task getTaskById(int id);
+
     Subtask getSubTaskById(int id);
+
     Epic getEpicById(int id);
 
     /*
     Удаление по идентификатору
      */
     void deleteTaskById(int id);
+
     void deleteSubtaskById(int id);
+
     void deleteEpicById(int id);
 
     /*
@@ -37,21 +43,27 @@ public interface TaskManager {
     Удаление всех задач
      */
     void deleteAllTasks();
+
     void deleteAllSubTasks();
+
     void deleteAllEpics();
 
     /*
     Обновление задач
      */
     void updateTask(Task task);
+
     void updateSubtask(Subtask task);
+
     void updateEpic(Epic task);
 
     /*
     Добавление задач
      */
     void addTask(Task task);
+
     void addSubtask(Subtask task);
+
     void addEpic(Epic task);
 
     /*

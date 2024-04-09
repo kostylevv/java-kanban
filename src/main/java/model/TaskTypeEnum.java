@@ -1,3 +1,3 @@
 package model;
 
-public enum TaskTypeEnum {TASK, SUBTASK, EPIC} //для упрощения определения типа задачи
+public enum TaskTypeEnum { TASK, SUBTASK, EPIC } //для упрощения определения типа задачи

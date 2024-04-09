@@ -161,11 +161,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public void restoreFromFile() {
         try (BufferedReader fileReader = new BufferedReader(new FileReader(fileName))) {
             boolean parseHistory = false;
-            while (fileReader.ready()){
+            while (fileReader.ready()) {
                 String str = fileReader.readLine();
                 if (str.isBlank()) {
                     parseHistory = true;
-                } else if(!str.startsWith("id,")&&!parseHistory) {
+                } else if (!str.startsWith("id,") && !parseHistory) {
                     String[] words = str.split(",");
                     switch (words[1].trim().toUpperCase()) {
                         case "TASK" -> {
@@ -195,7 +195,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                         if (t != null) {
                             historyManager.add(t);
                         } else {
-                            throw new ManagerSaveException("Failed to found task with id=" + i +".");
+                            throw new ManagerSaveException("Failed to found task with id=" + i + ".");
                         }
                     }
                 }
@@ -211,10 +211,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         tasks.addAll(this.getAllSubtasks());
         tasks.addAll(this.getAllEpics());
 
-        try (FileWriter out = new FileWriter(fileName)){
-             out.write(HEADER+"\n");
+        try (FileWriter out = new FileWriter(fileName)) {
+             out.write(HEADER + "\n");
              for (Task t : tasks) {
-                out.write(t.serialize()+"\n");
+                out.write(t.serialize() + "\n");
              }
              out.write("\n");
              out.write(historyToString(historyManager));
@@ -223,7 +223,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private static List<Integer> historyFromString(String value){
+    private static List<Integer> historyFromString(String value) {
         List<Integer> result = new ArrayList<>();
         if (value != null && !value.isEmpty()) {
             String[] words = value.split(",");
@@ -239,9 +239,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return result;
     }
 
-    private static String historyToString(HistoryManager manager){
+    private static String historyToString(HistoryManager manager) {
         List<Task> list = manager.getHistory();
-        if (list.size()>0) {
+        if (list.size() > 0) {
             StringBuilder sb = new StringBuilder();
             for (Task t : list) {
                 sb.append(t.getId());
@@ -250,7 +250,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             return sb.deleteCharAt(sb.length() - 1).toString();
         } else return "";
     }
-    private static void printHistory(TaskManager taskManager){
+
+    private static void printHistory(TaskManager taskManager) {
         System.out.println("--- History ---");
         for (Task task : taskManager.getHistory()) {
             System.out.println(task.toString());
