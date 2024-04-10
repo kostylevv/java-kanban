@@ -171,9 +171,18 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (task != null && tasks.containsKey(task.getId())) {
-            deleteWithPriority(task);
-            tasks.put(task.getId(), task);
-            addWithPriority(task);
+
+            boolean overlapTask = prioritizedTasks.stream()
+                    .filter(t -> t.getId() != task.getId())
+            .anyMatch(t -> isTasksOverlap(t, task));
+
+            if (!overlapTask) {
+                deleteWithPriority(task);
+                tasks.put(task.getId(), task);
+                addWithPriority(task);
+            } else {
+                throw new IllegalArgumentException("Невозможно обновить задачу, она пересекается с уже существующей");
+            }
         } else {
             System.out.println("model.Task == null или задачи не существует");
         }
@@ -182,11 +191,20 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask task) {
         if (task != null && subTasks.containsKey(task.getId())) {
-            deleteWithPriority(task);
-            subTasks.put(task.getId(), task);
-            Epic epic = getEpicById(task.getIdEpic());
-            updateEpicStatus(epic);
-            addWithPriority(task);
+
+            boolean overlapTask = prioritizedTasks.stream()
+                            .filter(t -> t.getId() != task.getId())
+                    .anyMatch(t -> isTasksOverlap(t, task));
+
+            if (!overlapTask) {
+                deleteWithPriority(task);
+                subTasks.put(task.getId(), task);
+                Epic epic = getEpicById(task.getIdEpic());
+                updateEpicStatus(epic);
+                addWithPriority(task);
+            } else {
+                throw new IllegalArgumentException("Невозможно обновить подзадачу, она пересекается с уже существующей");
+            }
         } else {
             System.out.println("model.Task == null или задачи не существует");
         }
@@ -208,15 +226,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(Task task) {
         if (task != null && task.getType() == TaskTypeEnum.TASK) {
-            boolean overlapTask = tasks.entrySet().stream().anyMatch(t -> isTasksOverlap(t.getValue(), task));
-            boolean overlapSubtask = subTasks.entrySet().stream().anyMatch(t -> isTasksOverlap(t.getValue(), task));
+            boolean overlapTask = prioritizedTasks.stream().anyMatch(t -> isTasksOverlap(t, task));
 
-            if (!overlapTask && !overlapSubtask) {
+            if (!overlapTask) {
                 task.setId(getTaskId());
                 tasks.put(task.getId(), task);
                 addWithPriority(task);
             } else {
-                System.out.println("Задача " + task + " пересекается с уже существующей задачей. Невозможно добавить");
+                throw new IllegalArgumentException("Невозможно обновить пзадачу, она пересекается с уже существующей");
             }
         } else {
             System.out.println("model.Task == null или неверный тип задачи");
@@ -227,10 +244,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void addSubtask(Subtask task) {
         if (task != null && task.getType() == TaskTypeEnum.SUBTASK) {
             if (epics.containsKey(task.getIdEpic())) {
-                boolean overlapTask = tasks.entrySet().stream().anyMatch(t -> isTasksOverlap(t.getValue(), task));
-                boolean overlapSubtask = subTasks.entrySet().stream().anyMatch(t -> isTasksOverlap(t.getValue(), task));
+                boolean overlapTask = prioritizedTasks.stream().anyMatch(t -> isTasksOverlap(t, task));
 
-                if (!overlapTask && !overlapSubtask) {
+                if (!overlapTask) {
                     task.setId(getTaskId());
                     subTasks.put(task.getId(), task);
                     Epic epic = epics.get(task.getIdEpic());
@@ -270,8 +286,7 @@ public class InMemoryTaskManager implements TaskManager {
         return prioritizedTasks.stream().toList();
     }
 
-    @Override
-    public boolean isTasksOverlap(Task t1, Task t2) {
+    private boolean isTasksOverlap(Task t1, Task t2) {
         if (t1.getStartTime().isEmpty() || t2.getStartTime().isEmpty() ||
                 t1.getDuration().isEmpty() || t2.getDuration().isEmpty()) {
             return false;

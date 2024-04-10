@@ -202,7 +202,7 @@ class TaskManagerTest<T extends TaskManager> {
         task1.setStartTime("2024-01-01T13:00:00");
         manager.addTask(task);
         manager.addTask(task1);
-        assertFalse(manager.isTasksOverlap(task, task1));
+        assertEquals(manager.getAllTasks().size(), 2);
     }
 
     @Test
@@ -214,8 +214,81 @@ class TaskManagerTest<T extends TaskManager> {
         task1.setDuration(60);
         task1.setStartTime("2024-01-01T12:59:00");
         manager.addTask(task);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            manager.addTask(task1);
+        }, "Невозможно обновить задачу, она пересекается с уже существующей");
+    }
+
+    @Test
+    public void updateTaskTest() {
+        Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
+        Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
+        task.setDuration(60);
+        task.setStartTime("2024-01-01T12:00:00");
+        task1.setDuration(60);
+        task1.setStartTime("2024-01-01T13:00:00");
+        manager.addTask(task);
         manager.addTask(task1);
-        assertTrue(manager.isTasksOverlap(task, task1));
+        assertEquals(manager.getAllTasks().size(),2);
+
+        Task taskUpdated = new Task(TaskStatusEnum.NEW, "test title updated", "test desc 1");
+        taskUpdated.setDuration(60);
+        taskUpdated.setStartTime("2024-01-01T14:30:00");
+        taskUpdated.setId(1);
+        manager.updateTask(taskUpdated);
+        assertEquals(manager.getAllTasks().size(),2);
+        assertEquals(manager.getTaskById(1).getStartTime().get().toString(), "2024-01-01T14:30");
+
+        Task taskUpdatedAgain = new Task(TaskStatusEnum.NEW, "test title updated", "test desc 1");
+        taskUpdatedAgain.setDuration(60);
+        taskUpdatedAgain.setStartTime("2024-01-01T13:00:00");
+        taskUpdatedAgain.setId(1);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            manager.updateTask(taskUpdatedAgain);
+        }, "Невозможно обновить задачу, она пересекается с уже существующей");
+
+        assertEquals(manager.getAllTasks().size(),2);
+        assertEquals(manager.getTaskById(1).getStartTime().get().toString(), "2024-01-01T14:30");
+
+    }
+
+    @Test
+    public void updateSubTaskTest() {
+        Epic epic = new Epic("e1", "e1d");
+        manager.addEpic(epic);
+
+        Subtask subtask = new Subtask(TaskStatusEnum.NEW, "St1", "st1d", epic.getId());
+        Subtask subtask1 = new Subtask(TaskStatusEnum.NEW, "St2", "st2d", epic.getId());
+
+        subtask.setDuration(60);
+        subtask.setStartTime("2024-01-01T12:00:00");
+        subtask1.setDuration(60);
+        subtask1.setStartTime("2024-01-01T13:00:00");
+        manager.addSubtask(subtask);
+        manager.addSubtask(subtask1);
+        assertEquals(manager.getAllSubtasks().size(),2);
+
+        Subtask subtaskUpdated = new Subtask(TaskStatusEnum.NEW, "test title updated", "test desc 1", epic.getId());
+        subtaskUpdated.setDuration(60);
+        subtaskUpdated.setStartTime("2024-01-01T14:30:00");
+        subtaskUpdated.setId(2);
+        manager.updateSubtask(subtaskUpdated);
+        assertEquals(manager.getAllSubtasks().size(),2);
+        assertEquals(manager.getSubTaskById(2).getStartTime().get().toString(), "2024-01-01T14:30");
+
+        Subtask subtaskUpdatedAgain = new Subtask(TaskStatusEnum.NEW, "test title updated", "test desc 1", epic.getId());
+        subtaskUpdatedAgain.setDuration(60);
+        subtaskUpdatedAgain.setStartTime("2024-01-01T13:00:00");
+        subtaskUpdatedAgain.setId(2);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            manager.updateSubtask(subtaskUpdatedAgain);
+        }, "Невозможно обновить подзадачу, она пересекается с уже существующей");
+
+        assertEquals(manager.getAllSubtasks().size(),2);
+        assertEquals(manager.getSubTaskById(2).getStartTime().get().toString(), "2024-01-01T14:30");
     }
 
 }

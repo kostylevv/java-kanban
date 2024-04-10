@@ -75,6 +75,4 @@ public interface TaskManager {
     Получение задач в порядке приоритета (по времени начала)
      */
     List<Task> getPrioritizedTasks();
-
-    boolean isTasksOverlap(Task t1, Task t2);
 }

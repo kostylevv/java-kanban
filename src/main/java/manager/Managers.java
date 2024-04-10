@@ -1,9 +1,11 @@
 package manager;
 
-public class Managers {
+import java.io.File;
 
+public class Managers {
     public static TaskManager getDefault() {
-        return new FileBackedTasksManager(getDefaultHistory(), "C:\\Users\\kosty\\Desktop\\java-kanbanf\\out\\save.csv");
+        File save = new File("./out/save.csv");
+        return new FileBackedTasksManager(getDefaultHistory(), save.getAbsolutePath());
     }
 
     public static HistoryManager getDefaultHistory() {
