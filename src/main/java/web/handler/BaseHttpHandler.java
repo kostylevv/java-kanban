@@ -1,6 +1,13 @@
 package web.handler;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
+import manager.Managers;
+import manager.TaskManager;
+import model.Epic;
+import model.Task;
+import model.TaskStatusEnum;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -14,6 +21,14 @@ public abstract class BaseHttpHandler {
     private static final int CODE_NOT_FOUND = 404;
     private static final int CODE_NOT_ACCEPTABLE = 406;
     private static final int CODE_ERROR = 500;
+
+    protected TaskManager manager = Managers.getDefault();
+
+    protected Gson gson;
+
+    BaseHttpHandler(TaskManager manager) {
+        this.manager = manager;
+    }
 
 
     protected void sendOkWithReply(HttpExchange exchange, String text) throws IOException {

@@ -1,17 +1,47 @@
 package web.handler;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import manager.TaskManager;
+import model.Task;
+import model.TaskStatusEnum;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
+    public TaskHandler(TaskManager manager) {
+        super(manager);
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
+        builder.registerTypeAdapter(Duration.class, new DurationAdapter());
+
+        gson = builder.create();
+
+        /*
+        For testing purposes
+         */
+        Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
+        Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
+        manager.addTask(task);
+        manager.addTask(task1);
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
 
         switch (endpoint) {
-            case GET_TASKS -> sendOkNoReply(exchange, Endpoint.GET_TASKS.name() + " invoked");
+            case GET_TASKS -> getAllTasks(exchange);
             case GET_TASK -> sendOkNoReply(exchange, Endpoint.GET_TASK.name() + " invoked");
             case CREATE_TASK -> sendOkWithReply(exchange, Endpoint.CREATE_TASK.name() + " invoked");
             case UPDATE_TASK -> sendOkWithReply(exchange, Endpoint.UPDATE_TASK.name() + " invoked");
@@ -20,6 +50,19 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             default -> new UnsupportedOperationException("Unsupported endpoint provided");
         }
 
+    }
+
+    private void getAllTasks(HttpExchange httpExchange) {
+        try {
+
+
+            List<Task> tasks = manager.getAllTasks();
+            String tasksJson = gson.toJson(tasks);
+            System.out.println(tasksJson);
+            sendOkNoReply(httpExchange, tasksJson);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Endpoint getEndpoint(String requestPath, String requestMethod) {
@@ -48,3 +91,60 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         return Endpoint.UNKNOWN;
     }
 }
+
+class TaskListTypeToken extends TypeToken<List<Task>> {}
+
+class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
+
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss:SSS");
+
+    @Override
+    public LocalDateTime read(JsonReader reader) throws IOException {
+        if (reader.peek() == JsonToken.NULL) {
+            reader.nextNull();
+            return null;
+        }
+        String timeString = reader.nextString();
+        return LocalDateTime.parse(timeString, timeFormatter);
+    }
+
+    @Override
+    public void write(JsonWriter writer, LocalDateTime time) throws IOException {
+        if (time == null) {
+            writer.nullValue();
+            return;
+        }
+        writer.value(time.format(timeFormatter));
+    }
+}
+
+class DurationAdapter extends TypeAdapter<Duration> {
+
+    @Override
+    public Duration read(JsonReader reader) throws IOException {
+        if (reader.peek() == JsonToken.NULL) {
+            reader.nextNull();
+            return null;
+        }
+        String durationString = reader.nextString();
+        try {
+            long durationLong = Long.parseLong(durationString);
+            Duration duration = Duration.ofMinutes(durationLong);
+            return duration;
+        } catch (Exception e) {
+            //pass
+        }
+        return null;
+    }
+
+    @Override
+    public void write(JsonWriter writer, Duration duration) throws IOException {
+        if (duration == null) {
+            writer.nullValue();
+            return;
+        }
+        writer.value(duration.toMinutes());
+    }
+}
+
+

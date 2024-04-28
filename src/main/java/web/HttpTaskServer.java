@@ -1,6 +1,7 @@
 package web;
 
 import com.sun.net.httpserver.HttpServer;
+import manager.Managers;
 import web.handler.TaskHandler;
 
 import java.io.IOException;
@@ -12,7 +13,7 @@ public class HttpTaskServer {
     public static void main(String[] args) {
         try {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
-            httpServer.createContext("/tasks", new TaskHandler());
+            httpServer.createContext("/tasks", new TaskHandler(Managers.getDefault()));
             httpServer.start();
             System.out.println("Task server is running on port " + PORT);
 
