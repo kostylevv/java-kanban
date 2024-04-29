@@ -42,7 +42,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
         switch (endpoint) {
             case GET_TASKS -> getAllTasks(exchange);
-            case GET_TASK -> sendOkNoReply(exchange, Endpoint.GET_TASK.name() + " invoked");
+            case GET_TASK -> getTask(exchange, exchange.getRequestURI().getPath());
             case CREATE_TASK -> sendOkWithReply(exchange, Endpoint.CREATE_TASK.name() + " invoked");
             case UPDATE_TASK -> sendOkWithReply(exchange, Endpoint.UPDATE_TASK.name() + " invoked");
             case DELETE_TASK -> sendOkNoReply(exchange, Endpoint.DELETE_TASK.name() + " invoked");
@@ -52,16 +52,31 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
     }
 
-    private void getAllTasks(HttpExchange httpExchange) {
-        try {
+    /**
+     * Get all tasks end output them as JSON
+     *
+     * @param httpExchange
+     */
+    private void getAllTasks(HttpExchange httpExchange) throws IOException {
+        List<Task> tasks = manager.getAllTasks();
+        String tasksJson = gson.toJson(tasks);
+        System.out.println(tasksJson);
+        sendOkWithReply(httpExchange, tasksJson);
+    }
 
-
-            List<Task> tasks = manager.getAllTasks();
-            String tasksJson = gson.toJson(tasks);
-            System.out.println(tasksJson);
-            sendOkNoReply(httpExchange, tasksJson);
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void getTask(HttpExchange httpExchange, String requestPath) throws ArithmeticException, IOException {
+        if (requestPath != null) {
+            String[] words = requestPath.split("/");
+            if (words.length == 3 && words[1].equals("tasks")) {
+                Integer taskId = Integer.parseInt(words[2]);
+                Task task = manager.getTaskById(taskId);
+                if (task != null) {
+                    String taskJson = gson.toJson(task, Task.class);
+                    sendOkWithReply(httpExchange, taskJson);
+                } else {
+                    sendNotFound(httpExchange, "Task with id = " + taskId + " not found");
+                }
+            }
         }
     }
 
@@ -73,7 +88,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         String[] words = requestPath.split("/");
 
         if (words.length == 2 && words[1].equals("tasks")) {
-            return switch (requestMethod){
+            return switch (requestMethod) {
                 case "GET" -> Endpoint.GET_TASKS;       //GET   /TASKS
                 case "POST" -> Endpoint.CREATE_TASK;    //POST  /TASKS
                 default -> Endpoint.UNKNOWN;
@@ -81,7 +96,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         }
 
         if (words.length == 3 && words[1].equals("tasks")) {
-            return switch (requestMethod){
+            return switch (requestMethod) {
                 case "GET" -> Endpoint.GET_TASK;        //GET     /TASKS/{id}
                 case "POST" -> Endpoint.UPDATE_TASK;    //POST    /TASKS/{id}
                 case "DELETE" -> Endpoint.DELETE_TASK;  //DELETE  /TASKS/{id}
@@ -92,7 +107,8 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 }
 
-class TaskListTypeToken extends TypeToken<List<Task>> {}
+class TaskListTypeToken extends TypeToken<List<Task>> {
+}
 
 class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
 
