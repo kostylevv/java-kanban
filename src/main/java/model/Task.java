@@ -32,6 +32,49 @@ public class Task {
         this(TaskTypeEnum.TASK, TaskStatusEnum.NEW, title, description);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Task))
+            return false;
+
+        Task oTask = (Task) o;
+        boolean check = oTask.id == this.id && oTask.title.equals(this.title) && oTask.description.equals(this.description)
+                && oTask.status.equals(this.status) && oTask.type.equals(this.type);
+        if (!check) {
+            return false;
+        } else {
+            if (this.startTime != null) {
+                if (oTask.startTime != null && oTask.startTime.equals(this.startTime))
+                    return false;
+            } else {
+                if (oTask.startTime != null)
+                    return false;
+            }
+            if (this.duration != null) {
+                if (oTask.duration != null && this.duration.equals(oTask.duration))
+                    return false;
+            } else {
+                if (oTask.duration != null)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Integer.hashCode(id);
+        result = 31 * result + title.hashCode();
+        result = 31 * result + description.hashCode();
+        result = 31 * result + status.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + startTime.hashCode();
+        result = 31 * result + duration.hashCode();
+        return result;
+    }
+
     public Optional<LocalDateTime> getEndTime() {
         if (getStartTime().isPresent() && getDuration().isPresent()) {
             return Optional.of(startTime.plusMinutes(duration.toMinutes()));

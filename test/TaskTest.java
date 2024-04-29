@@ -89,4 +89,21 @@ public class TaskTest {
         LocalDateTime localDateTime = LocalDateTime.parse("2024-03-23T21:00:00");
         assertTrue(task.getEndTime().get().equals(localDateTime));
     }
+
+    @Test
+    public void taskEqualityTest() {
+        Task task = new Task("test title task1", "test desc 1");
+        Task task2 = new Task("test title task2", "test desc 2");
+
+        manager.addTask(task);
+        manager.addTask(task2);
+        assertEquals(task, task);
+        assertNotEquals(task, task2);
+        task.setDescription("test desc 2");
+        task.setTitle("test title task2");
+        task2.setId(1);
+        assertEquals(task, task2);
+        task2.setDuration(1);
+        assertNotEquals(task, task2);
+    }
 }
