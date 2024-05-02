@@ -3,6 +3,7 @@ import manager.exception.NotFoundException;
 import manager.exception.OverlapException;
 import model.Epic;
 import model.Subtask;
+import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -63,7 +64,16 @@ public class SubtaskTest {
         assertTrue(manager.getAllSubtasks().size() == 0);
     }
 
+    @Test
+    public void subtaskEqualityTest() {
+        Subtask subtask1 = new Subtask("st1", "st1d",1);
+        Subtask subtask2 = new Subtask("st2", "st1d",1);
 
+        assertEquals(subtask1, subtask1);
+        assertNotEquals(subtask1, subtask2);
 
+        subtask1.setTitle("st2");
+        assertEquals(subtask1, subtask2);
+    }
 
 }

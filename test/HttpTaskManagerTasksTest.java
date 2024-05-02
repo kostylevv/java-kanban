@@ -2,7 +2,6 @@ import com.google.gson.*;
 import manager.Managers;
 import manager.TaskManager;
 import model.Task;
-import model.TaskStatusEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -111,25 +110,19 @@ public class HttpTaskManagerTasksTest {
 
     @Test
     public void testAddTask() throws InterruptedException, IOException {
-        // создаём задачу
         Task task = new Task("Test 2", "Testing task 2");
         task.setStartTime(Optional.of(LocalDateTime.now()));
         task.setDuration(Duration.ofMinutes(30));
 
-        // конвертируем её в JSON
         String taskJson = taskGson.toJson(task);
 
-        // создаём HTTP-клиент и запрос
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
 
-        // вызываем рест, отвечающий за создание задач
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        // проверяем код ответа
         assertEquals(201, response.statusCode());
 
-        // проверяем, что создалась одна задача с корректным именем
         List<Task> tasksFromManager = manager.getAllTasks();
 
         assertNotNull(tasksFromManager, "Task list is empty");

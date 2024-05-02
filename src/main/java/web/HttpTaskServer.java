@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import manager.Managers;
 import manager.TaskManager;
+import web.handler.BaseHttpHandler;
+import web.handler.subtaskhandler.SubtaskHandler;
 import web.handler.taskhandler.TaskHandler;
 
 import java.io.IOException;
@@ -13,17 +15,21 @@ public class HttpTaskServer {
     private static final int PORT = 8080;
     private static TaskManager taskManager;
     private static TaskHandler taskHandler;
+    private static SubtaskHandler subtaskHandler;
     HttpServer httpServer;
-    private Gson taskGson;
+    private Gson gson;
 
     public HttpTaskServer(TaskManager manager) {
         taskManager = manager;
+
         taskHandler = new TaskHandler(taskManager);
-        taskGson = taskHandler.getGson();
+        subtaskHandler = new SubtaskHandler(taskManager);
+
+        gson = BaseHttpHandler.getGson();
     }
 
     public Gson getTaskGson() {
-        return taskGson;
+        return gson;
     }
 
     public static void main(String[] args) {
@@ -35,10 +41,12 @@ public class HttpTaskServer {
         try {
             httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
             httpServer.createContext("/tasks", taskHandler);
+            httpServer.createContext("/subtasks", subtaskHandler);
+
             httpServer.start();
             System.out.println("Task server is running on port " + PORT);
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            System.out.println("Internal server error: " + ioe.getMessage());
         }
     }
 

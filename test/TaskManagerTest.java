@@ -216,9 +216,9 @@ class TaskManagerTest<T extends TaskManager> {
         task1.setStartTime("2024-01-01T12:59:00");
         manager.addTask(task);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(OverlapException.class, () -> {
             manager.addTask(task1);
-        }, "Невозможно обновить задачу, она пересекается с уже существующей");
+        });
     }
 
     @Test

@@ -255,9 +255,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    /*
-    Добавление задач
-     */
+
     @Override
     public void addTask(Task task) {
         if (task != null && task.getType() == TaskTypeEnum.TASK) {
@@ -268,10 +266,17 @@ public class InMemoryTaskManager implements TaskManager {
                 tasks.put(task.getId(), task);
                 addWithPriority(task);
             } else {
-                throw new IllegalArgumentException("Невозможно обновить задачу, она пересекается с уже существующей");
+                throw new OverlapException("Task " + task + " overlaps with some existing " +
+                        "task and couldn't be added");
             }
         } else {
-            System.out.println("model.Task == null или неверный тип задачи");
+            String message;
+            if (task == null) {
+                message = "Task is null";
+            } else {
+                message = "Task " + task + " is of inappropriate type";
+            }
+            throw new NotFoundException(message);
         }
     }
 
@@ -289,14 +294,21 @@ public class InMemoryTaskManager implements TaskManager {
                     updateEpicStatus(epic);
                     addWithPriority(task);
                 } else {
-                    System.out.println("Задача " + task + " пересекается с уже существующей задачей. Невозможно добавить");
+                    throw new OverlapException("Subtask " + task + " overlaps with some existing " +
+                            "task and couldn't be added");
                 }
             } else {
-                System.out.println("Невозможно добавить подзадачу для несуществующего " +
-                        "эпика с ID = " + task.getIdEpic());
+                throw new NotFoundException("Unable to add subtask for non-existent epic with id " +
+                        " = " + task.getIdEpic());
             }
         } else {
-            System.out.println("model.Task == null или неверный тип задачи");
+            String message;
+            if (task == null) {
+                message = "Subtask is null";
+            } else {
+                message = "Subtask " + task + " is of inappropriate type";
+            }
+            throw new NotFoundException(message);
         }
     }
 
@@ -308,10 +320,16 @@ public class InMemoryTaskManager implements TaskManager {
                 epics.put(task.getId(), task);
                 updateEpicStatus(task);
             } else {
-                System.out.println("Невозможно добавить эпик c несуществующими подзадачами");
+                throw new NotFoundException("Unable to add epic with non-existent subtasks");
             }
         } else {
-            System.out.println("model.Task == null или неверный тип задачи");
+            String message;
+            if (task == null) {
+                message = "Epic is null";
+            } else {
+                message = "Epic " + task + " is of inappropriate type";
+            }
+            throw new NotFoundException(message);
         }
     }
 

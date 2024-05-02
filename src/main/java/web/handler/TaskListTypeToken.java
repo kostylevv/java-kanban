@@ -1,4 +1,4 @@
-package web.handler.taskhandler;
+package web.handler;
 
 import com.google.gson.reflect.TypeToken;
 import model.Task;
