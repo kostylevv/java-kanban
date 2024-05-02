@@ -21,7 +21,7 @@ public abstract class BaseHttpHandler {
 
     protected Gson gson;
 
-    BaseHttpHandler(TaskManager manager) {
+    public BaseHttpHandler(TaskManager manager) {
         this.manager = manager;
     }
 

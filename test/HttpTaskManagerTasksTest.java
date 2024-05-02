@@ -135,4 +135,34 @@ public class HttpTaskManagerTasksTest {
         response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(406, response.statusCode());
     }
+
+    @Test
+    public void testUpdateTest() throws InterruptedException, IOException {
+        Task task = new Task("Test 1", "Testing task 1");
+        Task task2 = new Task("Test 2", "Testing task 2");
+        task.setStartTime(Optional.of(LocalDateTime.now()));
+        task.setDuration(Duration.ofMinutes(60));
+
+        String taskJson = taskGson.toJson(task);
+        String taskJson2 = taskGson.toJson(task2);
+
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/tasks");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson2)).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        Task task3 = new Task("Test 1 updated", "Testing task 1");
+        task3.setId(1);
+        String taskJson3 = taskGson.toJson(task3);
+
+        request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/tasks/1"))
+                .POST(HttpRequest.BodyPublishers.ofString(taskJson3)).build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, response.statusCode());
+        assertEquals(task3, manager.getTaskById(1));
+        assertNotEquals(task, manager.getTaskById(1));
+
+    }
 }

@@ -1,15 +1,16 @@
-package web.handler;
+package web.handler.taskhandler;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
+import manager.exception.NotFoundException;
+import manager.exception.OverlapException;
 import model.Task;
-import model.TaskStatusEnum;
+import web.handler.BaseHttpHandler;
+import web.handler.Endpoint;
+import web.handler.taskhandler.DurationAdapter;
+import web.handler.taskhandler.LocalDateTimeTypeAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +27,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
         builder.registerTypeAdapter(Duration.class, new DurationAdapter());
-
         gson = builder.create();
     }
 
@@ -39,7 +38,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             case GET_TASKS -> getAllTasks(exchange);
             case GET_TASK -> getTask(exchange, exchange.getRequestURI().getPath());
             case ADD_TASK -> addTask(exchange);
-            case UPDATE_TASK -> sendOkWithReply(exchange, Endpoint.UPDATE_TASK.name() + " invoked");
+            case UPDATE_TASK -> updateTask(exchange);
             case DELETE_TASK -> sendOkNoReply(exchange, Endpoint.DELETE_TASK.name() + " invoked");
             case UNKNOWN -> sendNotFound(exchange, Endpoint.UNKNOWN.name() + " invoked");
         }
@@ -90,14 +89,30 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                 new InputStreamReader(httpExchange.getRequestBody(), StandardCharsets.UTF_8))
                 .lines()
                 .collect(Collectors.joining());
-
         try {
             Task task = gson.fromJson(body, Task.class);
             manager.addTask(task);
             sendOkNoReply(httpExchange, "added task " + task.toString());
         } catch (IllegalArgumentException iae) {
             sendHasOverlap(httpExchange, "task has overlap with existing task");
+        } catch (Exception e) {
+            sendError(httpExchange, e.getMessage());
+        }
+    }
 
+    private void updateTask(HttpExchange httpExchange) throws IOException {
+        String body = new BufferedReader(
+                new InputStreamReader(httpExchange.getRequestBody(), StandardCharsets.UTF_8))
+                .lines()
+                .collect(Collectors.joining());
+        try {
+            Task task = gson.fromJson(body, Task.class);
+            manager.updateTask(task);
+            sendOkNoReply(httpExchange, "added task " + task.toString());
+        } catch (OverlapException iae) {
+            sendHasOverlap(httpExchange, "task has overlap with existing task");
+        } catch (NotFoundException nfe) {
+            sendError(httpExchange, "task wasn't found");
         } catch (Exception e) {
             sendError(httpExchange, e.getMessage());
         }
@@ -136,60 +151,3 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         return Endpoint.UNKNOWN;
     }
 }
-
-class TaskListTypeToken extends TypeToken<List<Task>> {
-}
-
-class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
-
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-
-    @Override
-    public LocalDateTime read(JsonReader reader) throws IOException {
-        if (reader.peek() == JsonToken.NULL) {
-            reader.nextNull();
-            return null;
-        }
-        String timeString = reader.nextString();
-        return LocalDateTime.parse(timeString, timeFormatter);
-    }
-
-    @Override
-    public void write(JsonWriter writer, LocalDateTime time) throws IOException {
-        if (time == null) {
-            writer.nullValue();
-            return;
-        }
-        writer.value(time.format(timeFormatter));
-    }
-}
-
-class DurationAdapter extends TypeAdapter<Duration> {
-
-    @Override
-    public Duration read(JsonReader reader) throws IOException {
-        if (reader.peek() == JsonToken.NULL) {
-            reader.nextNull();
-            return null;
-        }
-        String durationString = reader.nextString();
-        try {
-            long durationLong = Long.parseLong(durationString);
-            return Duration.ofMinutes(durationLong);
-        } catch (Exception e) {
-            //pass
-        }
-        return null;
-    }
-
-    @Override
-    public void write(JsonWriter writer, Duration duration) throws IOException {
-        if (duration == null) {
-            writer.nullValue();
-            return;
-        }
-        writer.value(duration.toMinutes());
-    }
-}
-
-
