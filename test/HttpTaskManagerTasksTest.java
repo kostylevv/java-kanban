@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import web.HttpTaskServer;
+import web.handler.BaseHttpHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,12 +24,11 @@ public class HttpTaskManagerTasksTest {
 
     TaskManager manager;
     HttpTaskServer taskServer;
-    Gson taskGson;
+    Gson gson;
 
     public HttpTaskManagerTasksTest() {
         manager = Managers.getDefault();
         taskServer = new HttpTaskServer(manager);
-        taskGson = taskServer.getTaskGson();
     }
 
     @BeforeEach
@@ -37,6 +37,7 @@ public class HttpTaskManagerTasksTest {
         manager.deleteAllSubTasks();
         manager.deleteAllEpics();
         taskServer.start();
+        gson = BaseHttpHandler.getGson();
     }
 
     @AfterEach
@@ -51,8 +52,8 @@ public class HttpTaskManagerTasksTest {
         task.setStartTime(Optional.of(LocalDateTime.now()));
         task.setDuration(Duration.ofMinutes(60));
 
-        String taskJson = taskGson.toJson(task);
-        String taskJson2 = taskGson.toJson(task2);
+        String taskJson = gson.toJson(task);
+        String taskJson2 = gson.toJson(task2);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
@@ -83,8 +84,8 @@ public class HttpTaskManagerTasksTest {
         task.setStartTime(Optional.of(LocalDateTime.now()));
         task.setDuration(Duration.ofMinutes(60));
 
-        String taskJson = taskGson.toJson(task);
-        String taskJson2 = taskGson.toJson(task2);
+        String taskJson = gson.toJson(task);
+        String taskJson2 = gson.toJson(task2);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
@@ -98,7 +99,7 @@ public class HttpTaskManagerTasksTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
 
-        Task t = taskGson.fromJson(response.body(), Task.class);
+        Task t = gson.fromJson(response.body(), Task.class);
         task.setId(1);
         assertEquals(t,task);
         assertNotEquals(t, task2);
@@ -114,7 +115,7 @@ public class HttpTaskManagerTasksTest {
         task.setStartTime(Optional.of(LocalDateTime.now()));
         task.setDuration(Duration.ofMinutes(30));
 
-        String taskJson = taskGson.toJson(task);
+        String taskJson = gson.toJson(task);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
@@ -140,8 +141,8 @@ public class HttpTaskManagerTasksTest {
         task.setStartTime(Optional.of(LocalDateTime.now()));
         task.setDuration(Duration.ofMinutes(60));
 
-        String taskJson = taskGson.toJson(task);
-        String taskJson2 = taskGson.toJson(task2);
+        String taskJson = gson.toJson(task);
+        String taskJson2 = gson.toJson(task2);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");
@@ -152,7 +153,7 @@ public class HttpTaskManagerTasksTest {
 
         Task task3 = new Task("Test 1 updated", "Testing task 1");
         task3.setId(1);
-        String taskJson3 = taskGson.toJson(task3);
+        String taskJson3 = gson.toJson(task3);
 
         request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/tasks/1"))
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson3)).build();
@@ -170,8 +171,8 @@ public class HttpTaskManagerTasksTest {
         task.setStartTime(Optional.of(LocalDateTime.now()));
         task.setDuration(Duration.ofMinutes(60));
 
-        String taskJson = taskGson.toJson(task);
-        String taskJson2 = taskGson.toJson(task2);
+        String taskJson = gson.toJson(task);
+        String taskJson2 = gson.toJson(task2);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/tasks");

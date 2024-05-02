@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import web.HttpTaskServer;
+import web.handler.BaseHttpHandler;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,12 +30,11 @@ public class HttpTaskManagerSubtasksTest {
 
     TaskManager manager;
     HttpTaskServer taskServer;
-    Gson taskGson;
+    Gson gson;
 
     public HttpTaskManagerSubtasksTest() {
         manager = Managers.getDefault();
         taskServer = new HttpTaskServer(manager);
-        taskGson = taskServer.getTaskGson();
     }
 
     @BeforeEach
@@ -43,6 +43,7 @@ public class HttpTaskManagerSubtasksTest {
         manager.deleteAllSubTasks();
         manager.deleteAllEpics();
         taskServer.start();
+        gson = BaseHttpHandler.getGson();
     }
 
     @AfterEach
@@ -59,8 +60,8 @@ public class HttpTaskManagerSubtasksTest {
         subtask.setStartTime(Optional.of(LocalDateTime.now()));
         subtask.setDuration(Duration.ofMinutes(60));
 
-        String staskJson = taskGson.toJson(subtask);
-        String staskJson2 = taskGson.toJson(subtask2);
+        String staskJson = gson.toJson(subtask);
+        String staskJson2 = gson.toJson(subtask2);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/subtasks");
@@ -93,8 +94,8 @@ public class HttpTaskManagerSubtasksTest {
         subtask.setStartTime(Optional.of(LocalDateTime.now()));
         subtask.setDuration(Duration.ofMinutes(60));
 
-        String staskJson = taskGson.toJson(subtask);
-        String staskJson2 = taskGson.toJson(subtask2);
+        String staskJson = gson.toJson(subtask);
+        String staskJson2 = gson.toJson(subtask2);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/subtasks");
@@ -109,7 +110,7 @@ public class HttpTaskManagerSubtasksTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
 
-        Subtask t = taskGson.fromJson(response.body(), Subtask.class);
+        Subtask t = gson.fromJson(response.body(), Subtask.class);
         subtask.setId(2);
         assertEquals(t,subtask);
         assertNotEquals(t, subtask2);
@@ -127,7 +128,7 @@ public class HttpTaskManagerSubtasksTest {
         subtask.setStartTime(Optional.of(LocalDateTime.now()));
         subtask.setDuration(Duration.ofMinutes(60));
 
-        String staskJson = taskGson.toJson(subtask);
+        String staskJson = gson.toJson(subtask);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/subtasks");
@@ -155,8 +156,8 @@ public class HttpTaskManagerSubtasksTest {
         subtask.setStartTime(Optional.of(LocalDateTime.now()));
         subtask.setDuration(Duration.ofMinutes(60));
 
-        String staskJson = taskGson.toJson(subtask);
-        String staskJson2 = taskGson.toJson(subtask2);
+        String staskJson = gson.toJson(subtask);
+        String staskJson2 = gson.toJson(subtask2);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/subtasks");
@@ -168,7 +169,7 @@ public class HttpTaskManagerSubtasksTest {
 
         Subtask subtask3 = new Subtask("ST2 title upd", "ST2 desc",1);
         subtask3.setId(3);
-        String taskJson3 = taskGson.toJson(subtask3);
+        String taskJson3 = gson.toJson(subtask3);
 
         request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/subtasks/3"))
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson3)).build();
@@ -188,8 +189,8 @@ public class HttpTaskManagerSubtasksTest {
         subtask.setStartTime(Optional.of(LocalDateTime.now()));
         subtask.setDuration(Duration.ofMinutes(60));
 
-        String staskJson = taskGson.toJson(subtask);
-        String staskJson2 = taskGson.toJson(subtask2);
+        String staskJson = gson.toJson(subtask);
+        String staskJson2 = gson.toJson(subtask2);
 
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create("http://localhost:8080/subtasks");
