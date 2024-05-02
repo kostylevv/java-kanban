@@ -1,4 +1,5 @@
 import manager.Managers;
+import manager.exception.NotFoundException;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,9 @@ public class TaskTest {
 
         manager.deleteTaskById(2);
 
-        assertTrue(manager.getTaskById(2) == null);
+        assertThrows(NotFoundException.class, () -> {
+            manager.getTaskById(2);
+        });
     }
 
     @Test

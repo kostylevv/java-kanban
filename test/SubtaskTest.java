@@ -1,4 +1,6 @@
 import manager.Managers;
+import manager.exception.NotFoundException;
+import manager.exception.OverlapException;
 import model.Epic;
 import model.Subtask;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +42,10 @@ public class SubtaskTest {
 
         manager.deleteSubtaskById(2);
 
-        assertTrue(manager.getSubTaskById(2) == null);
+        assertThrows(NotFoundException.class, () -> {
+            manager.getSubTaskById(2);
+        });
+
     }
 
     @Test

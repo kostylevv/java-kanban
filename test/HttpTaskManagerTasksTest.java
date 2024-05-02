@@ -137,7 +137,7 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
-    public void testUpdateTest() throws InterruptedException, IOException {
+    public void testUpdateTask() throws InterruptedException, IOException {
         Task task = new Task("Test 1", "Testing task 1");
         Task task2 = new Task("Test 2", "Testing task 2");
         task.setStartTime(Optional.of(LocalDateTime.now()));

@@ -38,9 +38,6 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    /*
-    Получение списков всех задач
-     */
     @Override
     public List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
@@ -56,34 +53,49 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(epics.values());
     }
 
-    /*
-    Получение задач по идентификатору
+    /**
+     * Get task by ID
+     *
+     * @param id of a requested task
+     * @return Task with requested id or NotFoundException if task wasn't found
      */
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
         if (task != null) {
             historyManager.add(task);
-        }
-        return task;
+            return task;
+        } else throw new NotFoundException("Task with id=" + id + "wasn't found");
     }
 
+    /**
+     * Get subtask by ID
+     *
+     * @param id of a requested subtask
+     * @return Subtask with requested id or NotFoundException if task wasn't found
+     */
     @Override
     public Subtask getSubTaskById(int id) {
         Subtask subtask = subTasks.get(id);
         if (subtask != null) {
             historyManager.add(subtask);
-        }
-        return subtask;
+            return subtask;
+        } else throw new NotFoundException("Subtask with id=" + id + "wasn't found");
     }
 
+    /**
+     * Get epic by ID
+     *
+     * @param id
+     * @return Epic with requested id or NotFoundException if task wasn't found
+     */
     @Override
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
         if (epic != null) {
             historyManager.add(epic);
-        }
-        return epic;
+            return epic;
+        } else throw new NotFoundException("Epic with id=" + id + "wasn't found");
     }
 
     /*
@@ -169,6 +181,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     /*
     Обновление задач
+    @TODO check history for update invoke
      */
     @Override
     public void updateTask(Task task) {

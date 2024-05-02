@@ -8,7 +8,7 @@ import java.util.*;
 
 public interface TaskManager {
     /*
-    Получение списков всех задач
+    Getting all tasks
      */
     List<Task> getAllTasks();
 
@@ -20,11 +20,7 @@ public interface TaskManager {
     Получение задач по идентификатору
      */
 
-    /**
-     * Get task by id
-     * @param id of a task
-     * @return Task object or null if not found
-     */
+
     Task getTaskById(int id);
 
     Subtask getSubTaskById(int id);
