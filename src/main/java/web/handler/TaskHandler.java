@@ -107,6 +107,8 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             Task task = gson.fromJson(body, Task.class);
             manager.addTask(task);
             sendOkNoReply(httpExchange, "added task " + task.toString());
+        } catch (IllegalArgumentException iae) {
+            sendHasOverlap(httpExchange, "task has overlap with existing task");
 
         } catch (Exception e) {
             sendError(httpExchange, e.getMessage());

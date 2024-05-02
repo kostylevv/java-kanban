@@ -233,7 +233,7 @@ public class InMemoryTaskManager implements TaskManager {
                 tasks.put(task.getId(), task);
                 addWithPriority(task);
             } else {
-                throw new IllegalArgumentException("Невозможно обновить пзадачу, она пересекается с уже существующей");
+                throw new IllegalArgumentException("Невозможно обновить задачу, она пересекается с уже существующей");
             }
         } else {
             System.out.println("model.Task == null или неверный тип задачи");

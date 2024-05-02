@@ -72,5 +72,8 @@ public class HttpTaskManagerTasksTest {
         assertNotNull(tasksFromManager, "Task list is empty");
         assertEquals(1, tasksFromManager.size(), "Incorrect task count");
         assertEquals("Test 2", tasksFromManager.get(0).getTitle(), "Incorrect task name");
+
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(406, response.statusCode());
     }
 }
