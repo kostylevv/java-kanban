@@ -1,4 +1,4 @@
-import com.google.gson.Gson;
+import com.google.gson.*;
 import manager.Managers;
 import manager.TaskManager;
 import model.Task;
@@ -18,8 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HttpTaskManagerTasksTest {
 
@@ -47,7 +46,67 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
-    public void testAddTask() throws IOException, InterruptedException {
+    public void testGetTasks() throws InterruptedException, IOException {
+        Task task = new Task("Test 1", "Testing task 1");
+        Task task2 = new Task("Test 2", "Testing task 2");
+        task.setStartTime(Optional.of(LocalDateTime.now()));
+        task.setDuration(Duration.ofMinutes(60));
+
+        String taskJson = taskGson.toJson(task);
+        String taskJson2 = taskGson.toJson(task2);
+
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/tasks");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson2)).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+
+        request = HttpRequest.newBuilder().uri(url).GET().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
+
+        JsonElement jsonElement = JsonParser.parseString(response.body());
+
+        assertTrue(jsonElement.isJsonArray());
+
+        JsonArray jsonArray = jsonElement.getAsJsonArray();
+
+        assertEquals(jsonArray.size(),2);
+    }
+
+    @Test
+    public void testGetTask() throws InterruptedException, IOException {
+        Task task = new Task("Test 1", "Testing task 1");
+        Task task2 = new Task("Test 2", "Testing task 2");
+        task.setStartTime(Optional.of(LocalDateTime.now()));
+        task.setDuration(Duration.ofMinutes(60));
+
+        String taskJson = taskGson.toJson(task);
+        String taskJson2 = taskGson.toJson(task2);
+
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/tasks");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson)).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson2)).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+
+        request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/tasks/1")).GET().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
+
+        Task t = taskGson.fromJson(response.body(), Task.class);
+        task.setId(1);
+        assertEquals(t,task);
+        assertNotEquals(t, task2);
+    }
+
+    @Test
+    public void testAddTask() throws InterruptedException, IOException {
         // создаём задачу
         Task task = new Task("Test 2", "Testing task 2");
         task.setStartTime(Optional.of(LocalDateTime.now()));

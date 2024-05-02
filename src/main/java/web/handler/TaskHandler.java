@@ -29,15 +29,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         builder.registerTypeAdapter(Duration.class, new DurationAdapter());
 
         gson = builder.create();
-
-        /*
-        For testing purposes
-        @TODO remove
-         */
-        Task task = new Task(TaskStatusEnum.NEW, "test title task1", "test desc 1");
-        Task task1 = new Task(TaskStatusEnum.IN_PROGRESS, "test title taks2", "test desc2 ");
-        manager.addTask(task);
-        manager.addTask(task1);
     }
 
     @Override
@@ -63,7 +54,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private void getAllTasks(HttpExchange httpExchange) throws IOException {
         List<Task> tasks = manager.getAllTasks();
         String tasksJson = gson.toJson(tasks);
-        System.out.println(tasksJson);
         sendOkWithReply(httpExchange, tasksJson);
     }
 
@@ -88,7 +78,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                 sendNotFound(httpExchange, "Task with id = " + taskId + " not found");
             }
         }
-
     }
 
     /**
