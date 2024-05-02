@@ -66,7 +66,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
      * @throws IOException         if sendNotFound method will throw this exception
      */
     private void getTask(HttpExchange httpExchange, String requestPath) throws ArithmeticException, IOException {
-
         String[] words = requestPath.split("/");
         if (words.length == 3 && words[1].equals("tasks")) {
             int taskId = Integer.parseInt(words[2]);

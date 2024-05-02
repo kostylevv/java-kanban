@@ -1,5 +1,6 @@
 package manager;
 
+import manager.exception.ManagerSaveException;
 import model.*;
 
 import java.io.BufferedReader;

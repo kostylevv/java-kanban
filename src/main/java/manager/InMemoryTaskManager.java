@@ -1,5 +1,7 @@
 package manager;
 
+import manager.exception.NotFoundException;
+import manager.exception.OverlapException;
 import model.*;
 
 import java.time.Duration;
@@ -181,10 +183,17 @@ public class InMemoryTaskManager implements TaskManager {
                 tasks.put(task.getId(), task);
                 addWithPriority(task);
             } else {
-                throw new IllegalArgumentException("Невозможно обновить задачу, она пересекается с уже существующей");
+                throw new OverlapException("Task " + task + " overlaps with some existing " +
+                        "task and couldn't be added");
             }
         } else {
-            System.out.println("model.Task == null или задачи не существует");
+            String message;
+            if (task == null) {
+                message = "Task is null";
+            } else {
+                message = "Task " + task + " wasn't found. Can't update task that not exist";
+            }
+            throw new NotFoundException(message);
         }
     }
 
@@ -203,10 +212,17 @@ public class InMemoryTaskManager implements TaskManager {
                 updateEpicStatus(epic);
                 addWithPriority(task);
             } else {
-                throw new IllegalArgumentException("Невозможно обновить подзадачу, она пересекается с уже существующей");
+                throw new OverlapException("Subtask " + task + " overlaps with some existing " +
+                        "task and couldn't be added");
             }
         } else {
-            System.out.println("model.Task == null или задачи не существует");
+            String message;
+            if (task == null) {
+                message = "Subtask is null";
+            } else {
+                message = "Subtask " + task + " wasn't found. Can't update subtask that not exist";
+            }
+            throw new NotFoundException(message);
         }
     }
 
@@ -216,7 +232,13 @@ public class InMemoryTaskManager implements TaskManager {
             epics.put(task.getId(), task);
             updateEpicStatus(task);
         } else {
-            System.out.println("model.Task == null или задачи не существует");
+            String message;
+            if (task == null) {
+                message = "Epic is null";
+            } else {
+                message = "Epic " + task + " wasn't found. Can't update epic that not exist";
+            }
+            throw new NotFoundException(message);
         }
     }
 
