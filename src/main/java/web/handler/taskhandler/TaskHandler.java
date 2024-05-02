@@ -9,8 +9,6 @@ import manager.exception.OverlapException;
 import model.Task;
 import web.handler.BaseHttpHandler;
 import web.handler.Endpoint;
-import web.handler.taskhandler.DurationAdapter;
-import web.handler.taskhandler.LocalDateTimeTypeAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,7 +37,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             case GET_TASK -> getTask(exchange, exchange.getRequestURI().getPath());
             case ADD_TASK -> addTask(exchange);
             case UPDATE_TASK -> updateTask(exchange);
-            case DELETE_TASK -> sendOkNoReply(exchange, Endpoint.DELETE_TASK.name() + " invoked");
+            case DELETE_TASK -> deleteTask(exchange, exchange.getRequestURI().getPath());
             case UNKNOWN -> sendNotFound(exchange, Endpoint.UNKNOWN.name() + " invoked");
         }
 
@@ -68,12 +66,12 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         String[] words = requestPath.split("/");
         if (words.length == 3 && words[1].equals("tasks")) {
             int taskId = Integer.parseInt(words[2]);
-            Task task = manager.getTaskById(taskId);
-            if (task != null) {
+            try {
+                Task task = manager.getTaskById(taskId);
                 String taskJson = gson.toJson(task, Task.class);
                 sendOkWithReply(httpExchange, taskJson);
-            } else {
-                sendNotFound(httpExchange, "Task with id = " + taskId + " not found");
+            } catch (NotFoundException notFoundException) {
+                sendNotFound(httpExchange, "Task wasn't found");
             }
         }
     }
@@ -82,7 +80,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
      * Add task
      *
      * @param httpExchange exchange object with new Task in json-string in body
-     * @throws IOException if sendNotFound method will throw this exception
+     * @throws IOException if send methods will throw this exception
      */
     private void addTask(HttpExchange httpExchange) throws IOException {
         String body = new BufferedReader(
@@ -100,6 +98,12 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
+    /**
+     * Update task
+     *
+     * @param httpExchange exchange object with updated Task in json-string in body
+     * @throws IOException if send methods will throw this exception
+     */
     private void updateTask(HttpExchange httpExchange) throws IOException {
         String body = new BufferedReader(
                 new InputStreamReader(httpExchange.getRequestBody(), StandardCharsets.UTF_8))
@@ -115,6 +119,16 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             sendError(httpExchange, "task wasn't found");
         } catch (Exception e) {
             sendError(httpExchange, e.getMessage());
+        }
+    }
+
+    private void deleteTask(HttpExchange httpExchange, String requestPath) throws IOException {
+        String[] words = requestPath.split("/");
+        if (words.length == 3 && words[1].equals("tasks")) {
+            int taskId = Integer.parseInt(words[2]);
+            //@TODO arithmetic exception catch
+            manager.deleteTaskById(taskId);
+            sendOkWithReply(httpExchange, "Task deleted");
         }
     }
 
