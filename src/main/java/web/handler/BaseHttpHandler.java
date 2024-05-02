@@ -22,12 +22,16 @@ public abstract class BaseHttpHandler {
     private static final int CODE_NOT_ACCEPTABLE = 406;
     private static final int CODE_ERROR = 500;
 
-    protected TaskManager manager = Managers.getDefault();
+    protected TaskManager manager;
 
     protected Gson gson;
 
     BaseHttpHandler(TaskManager manager) {
         this.manager = manager;
+    }
+
+    public Gson getGson() {
+        return gson;
     }
 
 
@@ -63,4 +67,11 @@ public abstract class BaseHttpHandler {
         exchange.close();
     }
 
+    public void sendError(HttpExchange exchange, String text) throws IOException {
+        byte[] resp = text.getBytes(DEFAULT_CHARSET);
+        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        exchange.sendResponseHeaders(CODE_ERROR, resp.length);
+        exchange.getResponseBody().write(resp);
+        exchange.close();
+    }
 }
