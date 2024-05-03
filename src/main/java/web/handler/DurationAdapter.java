@@ -20,10 +20,9 @@ public class DurationAdapter extends TypeAdapter<Duration> {
         try {
             long durationLong = Long.parseLong(durationString);
             return Duration.ofMinutes(durationLong);
-        } catch (Exception e) {
-            //pass
+        } catch (ArithmeticException | NumberFormatException e) {
+            return null;
         }
-        return null;
     }
 
     @Override
