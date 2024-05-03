@@ -5,6 +5,7 @@ import manager.Managers;
 import manager.TaskManager;
 import web.handler.epichandler.EpicHandler;
 import web.handler.historyhandler.HistoryHandler;
+import web.handler.prioritizedhandler.PrioritizedHandler;
 import web.handler.subtaskhandler.SubtaskHandler;
 import web.handler.taskhandler.TaskHandler;
 
@@ -32,6 +33,7 @@ public class HttpTaskServer {
             httpServer.createContext("/subtasks", new SubtaskHandler(taskManager));
             httpServer.createContext("/epics", new EpicHandler(taskManager));
             httpServer.createContext("/history", new HistoryHandler(taskManager));
+            httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager));
 
             httpServer.start();
             System.out.println("Task server is running on port " + PORT);

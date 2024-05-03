@@ -98,9 +98,6 @@ public class InMemoryTaskManager implements TaskManager {
         } else throw new NotFoundException("Epic with id=" + id + "wasn't found");
     }
 
-    /*
-    Удаление по идентификатору
-     */
     @Override
     public void deleteTaskById(int id) {
         Task task = getTaskById(id);
@@ -128,9 +125,6 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.remove(id);
     }
 
-    /*
-    Получение подзадач эпика
-     */
     @Override
     public List<Subtask> getSubtasks(Epic epic) {
         if (epic != null && epics.containsKey(epic.getId())) {
@@ -140,15 +134,14 @@ public class InMemoryTaskManager implements TaskManager {
                     .collect(Collectors.toList());
 
         } else {
-            //@TODO fix
-            System.out.println("model.Epic == null или нет такого эпика");
-            return new ArrayList<>();
+            if (epic == null) {
+                throw new NotFoundException("Epic is null");
+            } else {
+                throw new NotFoundException("Epic with id=" + epic.getId() + "wasn't found");
+            }
         }
     }
 
-    /*
-    Удаление всех задач
-     */
     @Override
     public void deleteAllTasks() {
         for (Task task : getAllTasks()) {
@@ -180,10 +173,6 @@ public class InMemoryTaskManager implements TaskManager {
         epics.clear();
     }
 
-    /*
-    Обновление задач
-    @TODO check history for update invoke
-     */
     @Override
     public void updateTask(Task task) {
         if (task != null && tasks.containsKey(task.getId())) {
@@ -356,9 +345,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    /*
-    Метод следит за статусом эпика исходя из статусов подзадач
-     */
     private void updateEpicStatus(Epic epic) {
         if (epic != null && epics.containsKey(epic.getId())) {
             List<Subtask> subtasks = getSubtasks(epic);
@@ -418,10 +404,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private int getTaskId() {
-        return ++lastId;
-    }
-
     private void deleteAllEpicSubtasks(Epic epic) {
         for (int id : epic.getSubtasks()) {
             subTasks.remove(id);
@@ -437,5 +419,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     private static void deleteWithPriority(Task task) {
         prioritizedTasks.remove(task);
+    }
+
+    private int getTaskId() {
+        return ++lastId;
     }
 }
