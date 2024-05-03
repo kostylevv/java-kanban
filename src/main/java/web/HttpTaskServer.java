@@ -1,11 +1,10 @@
 package web;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import manager.Managers;
 import manager.TaskManager;
-import web.handler.BaseHttpHandler;
 import web.handler.epichandler.EpicHandler;
+import web.handler.historyhandler.HistoryHandler;
 import web.handler.subtaskhandler.SubtaskHandler;
 import web.handler.taskhandler.TaskHandler;
 
@@ -32,7 +31,7 @@ public class HttpTaskServer {
             httpServer.createContext("/tasks", new TaskHandler(taskManager));
             httpServer.createContext("/subtasks", new SubtaskHandler(taskManager));
             httpServer.createContext("/epics", new EpicHandler(taskManager));
-
+            httpServer.createContext("/history", new HistoryHandler(taskManager));
 
             httpServer.start();
             System.out.println("Task server is running on port " + PORT);

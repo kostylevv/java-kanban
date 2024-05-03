@@ -86,8 +86,8 @@ public class InMemoryTaskManager implements TaskManager {
     /**
      * Get epic by ID
      *
-     * @param id
-     * @return Epic with requested id or NotFoundException if task wasn't found
+     * @param id requested ID
+     * @return Epic with requested ID or NotFoundException if task wasn't found
      */
     @Override
     public Epic getEpicById(int id) {
@@ -336,7 +336,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getPrioritizedTasks() {
-        System.out.println(prioritizedTasks.size());
         return prioritizedTasks.stream().toList();
     }
 
