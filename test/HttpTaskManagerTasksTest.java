@@ -32,7 +32,7 @@ public class HttpTaskManagerTasksTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         manager.deleteAllTasks();
         manager.deleteAllSubTasks();
         manager.deleteAllEpics();

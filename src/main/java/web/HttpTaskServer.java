@@ -21,25 +21,21 @@ public class HttpTaskServer {
         taskManager = manager;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         HttpTaskServer server = new HttpTaskServer(Managers.getDefault());
         server.start();
     }
 
-    public void start() {
-        try {
-            httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
-            httpServer.createContext("/tasks", new TaskHandler(taskManager));
-            httpServer.createContext("/subtasks", new SubtaskHandler(taskManager));
-            httpServer.createContext("/epics", new EpicHandler(taskManager));
-            httpServer.createContext("/history", new HistoryHandler(taskManager));
-            httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager));
+    public void start() throws IOException {
+        httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
+        httpServer.createContext("/tasks", new TaskHandler(taskManager));
+        httpServer.createContext("/subtasks", new SubtaskHandler(taskManager));
+        httpServer.createContext("/epics", new EpicHandler(taskManager));
+        httpServer.createContext("/history", new HistoryHandler(taskManager));
+        httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager));
 
-            httpServer.start();
-            System.out.println("Task server is running on port " + PORT);
-        } catch (IOException ioe) {
-            System.out.println("Internal server error: " + ioe.getMessage());
-        }
+        httpServer.start();
+        System.out.println("Task server is running on port " + PORT);
     }
 
     public void stop() {
