@@ -1,7 +1,6 @@
 package web.handler.epichandler;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 import manager.exception.NotFoundException;
 import model.Epic;
@@ -16,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EpicHandler extends BaseHttpHandler implements HttpHandler {
+public class EpicHandler extends BaseHttpHandler {
     public EpicHandler(TaskManager manager) {
         super(manager);
     }

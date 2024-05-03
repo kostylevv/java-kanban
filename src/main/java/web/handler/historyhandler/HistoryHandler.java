@@ -1,7 +1,6 @@
 package web.handler.historyhandler;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 import model.Task;
 import web.handler.BaseHttpHandler;
@@ -9,7 +8,7 @@ import web.handler.BaseHttpHandler;
 import java.io.IOException;
 import java.util.List;
 
-public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
+public class HistoryHandler extends BaseHttpHandler {
     public HistoryHandler(TaskManager manager) {
         super(manager);
     }

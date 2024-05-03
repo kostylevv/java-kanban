@@ -3,6 +3,7 @@ package web.handler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public abstract class BaseHttpHandler {
+public abstract class BaseHttpHandler implements HttpHandler {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     private static final int CODE_OK_WITH_REPLY = 200;
@@ -26,11 +27,13 @@ public abstract class BaseHttpHandler {
 
     public BaseHttpHandler(TaskManager manager) {
         this.manager = manager;
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
-        builder.registerTypeAdapter(Duration.class, new DurationAdapter());
-        gson = builder.create();
+        gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .create();
     }
+
+    public abstract void handle(HttpExchange exchange) throws IOException;
 
     public static Gson getGson() {
         return gson;

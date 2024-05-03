@@ -1,7 +1,6 @@
 package web.handler.taskhandler;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 import manager.exception.NotFoundException;
 import manager.exception.OverlapException;
@@ -15,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TaskHandler extends BaseHttpHandler implements HttpHandler {
+public class TaskHandler extends BaseHttpHandler {
     public TaskHandler(TaskManager manager) {
         super(manager);
     }

@@ -1,13 +1,11 @@
 package web.handler.subtaskhandler;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
 import manager.exception.NotFoundException;
 import manager.exception.OverlapException;
 import model.Subtask;
 import web.handler.BaseHttpHandler;
-
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
+public class SubtaskHandler extends BaseHttpHandler {
     public SubtaskHandler(TaskManager manager) {
         super(manager);
     }
