@@ -14,6 +14,50 @@ public class Epic extends Task {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Epic oTask))
+            return false;
+
+        if (oTask.id != this.id || !oTask.title.equals(this.title) || !oTask.description.equals(this.description)
+                || !oTask.status.equals(this.status) || !oTask.type.equals(this.type)) {
+            return false;
+        }
+
+        if (this.startTime != null) {
+            if (oTask.startTime != null && !oTask.startTime.equals(this.startTime)) {
+                return false;
+            }
+        } else {
+            if (oTask.startTime != null) {
+                return false;
+            }
+        }
+
+        if (this.duration != null) {
+            if (oTask.duration == null || !this.duration.equals(oTask.duration)) {
+                return false;
+            }
+        } else {
+            if (oTask.duration != null) {
+                return false;
+            }
+        }
+
+        return oTask.subtasks.equals(this.subtasks);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        for (int i : subtasks) {
+            result = result * 31 * i;
+        }
+        return super.hashCode() * result;
+    }
+
+    @Override
     public Optional<LocalDateTime> getEndTime() {
         if (endTime != null) {
             return Optional.of(endTime);

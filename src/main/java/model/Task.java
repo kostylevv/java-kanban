@@ -32,6 +32,47 @@ public class Task {
         this(TaskTypeEnum.TASK, TaskStatusEnum.NEW, title, description);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Task oTask))
+            return false;
+
+        if (oTask.id != this.id || !oTask.title.equals(this.title) || !oTask.description.equals(this.description)
+                || !oTask.status.equals(this.status) || !oTask.type.equals(this.type)) {
+            return false;
+        }
+
+        if (this.startTime != null) {
+            if (oTask.startTime != null && !oTask.startTime.equals(this.startTime)) {
+                return false;
+            }
+        } else {
+            if (oTask.startTime != null) {
+                return false;
+            }
+        }
+
+        if (this.duration != null) {
+            return oTask.duration == null || this.duration.equals(oTask.duration);
+        } else {
+            return oTask.duration == null;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Integer.hashCode(id);
+        result = 31 * result + title.hashCode();
+        result = 31 * result + description.hashCode();
+        result = 31 * result + status.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + startTime.hashCode();
+        result = 31 * result + duration.hashCode();
+        return result;
+    }
+
     public Optional<LocalDateTime> getEndTime() {
         if (getStartTime().isPresent() && getDuration().isPresent()) {
             return Optional.of(startTime.plusMinutes(duration.toMinutes()));
@@ -45,11 +86,7 @@ public class Task {
     }
 
     public void setStartTime(Optional<LocalDateTime> startTime) {
-        if (startTime.isPresent()) {
-            this.startTime = startTime.get();
-        } else {
-            this.startTime = null;
-        }
+        this.startTime = startTime.orElse(null);
     }
 
     public void setStartTime(String startTimeString) {
@@ -67,11 +104,7 @@ public class Task {
     }
 
     public void setDuration(Duration duration) {
-        if (duration != null) {
-            this.duration = duration;
-        } else {
-            this.duration = null;
-        }
+        this.duration = duration;
     }
 
     public void setDuration(long durationLong) {
@@ -163,13 +196,13 @@ public class Task {
     }
 
     /**
+     * Construct Task object from comma-separated string
      *
-     * id,type,status,title,description,startTime,duration
-     * 0, 1,   2,     3,    4,          5,        6
-     *
-     * @param str
-     * @return
-     * @throws IllegalArgumentException
+     * @param str Comma-separated string of pattern:
+     *      * id,type,status,title,description,startTime,duration
+     *      * 0, 1,   2,     3,    4,          5,        6
+     * @return Task object
+     * @throws IllegalArgumentException in case of parsing error
      */
 
     public static Task fromString(String str) throws IllegalArgumentException {

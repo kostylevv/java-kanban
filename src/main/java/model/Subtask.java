@@ -13,6 +13,40 @@ public class Subtask extends Task {
         setIdEpic(idEpic);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Subtask oTask))
+            return false;
+
+        if (oTask.id != this.id || !oTask.title.equals(this.title) || !oTask.description.equals(this.description)
+                || !oTask.status.equals(this.status) || !oTask.type.equals(this.type) || oTask.idEpic != this.idEpic) {
+            return false;
+        }
+
+        if (this.startTime != null) {
+            if (oTask.startTime != null && !oTask.startTime.equals(this.startTime)) {
+                return false;
+            }
+        } else {
+            if (oTask.startTime != null) {
+                return false;
+            }
+        }
+
+        if (this.duration != null) {
+            return oTask.duration == null || this.duration.equals(oTask.duration);
+        } else {
+            return oTask.duration == null;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() * 31 * idEpic;
+    }
+
     public int getIdEpic() {
         return idEpic;
     }

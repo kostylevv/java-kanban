@@ -1,4 +1,5 @@
 import manager.Managers;
+import manager.exception.NotFoundException;
 import model.Epic;
 import model.Subtask;
 import model.TaskStatusEnum;
@@ -110,7 +111,7 @@ public class EpicTest {
 
         manager.deleteEpicById(2);
 
-        assertNull(manager.getEpicById(2));
+        assertThrows(NotFoundException.class, () -> manager.getEpicById(2));
     }
 
     @Test
@@ -155,7 +156,6 @@ public class EpicTest {
 
         assertTrue(epic.getEndTime().isPresent(), epic.getEndTime().get().toString());
         assertEquals(180, epic.getDuration().get().toMinutes());
-        System.out.println(epic.getDuration().get().toMinutes());
         assertEquals(epic.getStartTime().get(), LocalDateTime.parse("2024-03-23T20:00:00"));
         assertEquals(epic.getEndTime().get(), LocalDateTime.parse("2024-03-26T21:00:00"));
 

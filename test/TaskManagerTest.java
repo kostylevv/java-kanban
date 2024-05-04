@@ -1,5 +1,6 @@
 import manager.Managers;
 import manager.TaskManager;
+import manager.exception.OverlapException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -215,9 +216,9 @@ class TaskManagerTest<T extends TaskManager> {
         task1.setStartTime("2024-01-01T12:59:00");
         manager.addTask(task);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(OverlapException.class, () -> {
             manager.addTask(task1);
-        }, "Невозможно обновить задачу, она пересекается с уже существующей");
+        });
     }
 
     @Test
@@ -245,9 +246,9 @@ class TaskManagerTest<T extends TaskManager> {
         taskUpdatedAgain.setStartTime("2024-01-01T13:00:00");
         taskUpdatedAgain.setId(1);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(OverlapException.class, () -> {
             manager.updateTask(taskUpdatedAgain);
-        }, "Невозможно обновить задачу, она пересекается с уже существующей");
+        });
 
         assertEquals(manager.getAllTasks().size(),2);
         assertEquals(manager.getTaskById(1).getStartTime().get().toString(), "2024-01-01T14:30");
@@ -283,9 +284,9 @@ class TaskManagerTest<T extends TaskManager> {
         subtaskUpdatedAgain.setStartTime("2024-01-01T13:00:00");
         subtaskUpdatedAgain.setId(2);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(OverlapException.class, () -> {
             manager.updateSubtask(subtaskUpdatedAgain);
-        }, "Невозможно обновить подзадачу, она пересекается с уже существующей");
+        });
 
         assertEquals(manager.getAllSubtasks().size(),2);
         assertEquals(manager.getSubTaskById(2).getStartTime().get().toString(), "2024-01-01T14:30");
